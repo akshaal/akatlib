@@ -1,0 +1,9 @@
+#!/bin/sh
+
+list="atmega16 atmega32 attiny2313 attiny85"
+
+for mcu in $list; do
+    echo "----------------- Installing for: $mcu"
+    make clean
+    make MCU=$mcu "$@" install
+done
