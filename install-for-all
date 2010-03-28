@@ -1,6 +1,6 @@
 #!/bin/sh
 
-list="atmega16 atmega32 attiny2313 attiny85"
+list="atmega16 atmega32 attiny2313 attiny85 atmega48"
 
 for mcu in $list; do
     echo "----------------- Installing for: $mcu"

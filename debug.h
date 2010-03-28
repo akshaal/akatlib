@@ -5,8 +5,14 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-#ifndef AKATLIB_H_
-#define AKATLIB_H_
+#ifndef AKAT_INTERNAL_DEBUG_H_
+#define AKAT_INTERNAL_DEBUG_H_
 
+#include <stdint.h>
+
+/**
+ * Initialize debug logging support.
+ */
+void akat_init_debug ();
 
 #endif

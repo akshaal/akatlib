@@ -5,6 +5,12 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-// Dispatching
+// State for akat
 
+#include "state.h"
 
+/**
+ * State of akat library.
+ */
+akat_state_t akat_state = {
+};

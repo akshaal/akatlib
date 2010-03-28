@@ -5,6 +5,12 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-// Dispatching
+// Initialization
 
+#include <stdint.h>
 
+#include "debug.h"
+
+void akat_init () {
+    akat_init_debug ();
+}
