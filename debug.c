@@ -17,7 +17,7 @@
 #include "debug.h"
 #include "state.h"
 
-static FILE debug_stdout;
+static FILE debug_out;
 
 /**
  * This external function should gives us state of debugging.
@@ -46,7 +46,7 @@ static int akat_debug_uart_putchar (char c, FILE *stream) {
  */
 void akat_init_debug () {
     if (is_akat_debug_on ()) {
-        fdev_setup_stream (&debug_stdout, akat_debug_uart_putchar, NULL, _FDEV_SETUP_WRITE);
+        fdev_setup_stream (&debug_out, akat_debug_uart_putchar, NULL, _FDEV_SETUP_WRITE);
     }
 }
 
@@ -55,7 +55,7 @@ void akat_init_debug () {
  */
 void vdebugf (char *fmt, va_list ap) {
     if (is_akat_debug_on ()) {
-        vfprintf (&debug_stdout, fmt, ap);
+        vfprintf (&debug_out, fmt, ap);
     }
 }
 
@@ -63,7 +63,7 @@ void vdebugf (char *fmt, va_list ap) {
  * Like printf but output is redirected to the debug stream.
  */
 void debugf (char *fmt, ...) {
-   if (is_akat_debug_on ()) {
+    if (is_akat_debug_on ()) {
         va_list ap;
 
         va_start (ap, fmt);
@@ -72,3 +72,11 @@ void debugf (char *fmt, ...) {
     }
 }
 
+/**
+ * Send string to the debug output.
+ */
+void debug (char *str) {
+    if (is_akat_debug_on ()) {
+        fputs (str, &debug_out);
+    }
+}

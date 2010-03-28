@@ -5,17 +5,12 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-// Initialization
-
-#include <stdint.h>
-
-#include "debug.h"
-#include "dispatcher.h"
+#ifndef AKAT_INTERNAL_DISPATCHER_H_
+#define AKAT_INTERNAL_DISPATCHER_H_
 
 /**
- * Initialize akat library.
+ * Initialize dispatcher.
  */
-void akat_init () {
-    akat_init_debug ();
-    akat_init_dispatcher ();
-}
+void akat_init_dispatcher ();
+
+#endif /* AKAT_INTERNAL_DISPATCHER_H_ */
