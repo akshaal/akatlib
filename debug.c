@@ -22,7 +22,7 @@ static FILE debug_out;
 /**
  * This external function should gives us state of debugging.
  */
-extern short is_akat_debug_on () __ATTR_PURE__ __ATTR_CONST__;
+extern uint8_t is_akat_debug_on () __ATTR_PURE__ __ATTR_CONST__;
 
 /**
  * Send a char to the stream. Used to redirect debug output to the microcontroller's UART.

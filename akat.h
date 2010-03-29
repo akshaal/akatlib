@@ -13,11 +13,11 @@
 #include <stdlib.h>
 
 #ifdef AKAT_DEBUG_ON
-short is_akat_debug_on () {return 1;}
+uint8_t is_akat_debug_on () {return 1;}
 #else
 
 #ifdef AKAT_DEBUG_OFF
-short is_akat_debug_on () {return 0;}
+uint8_t is_akat_debug_on () {return 0;}
 #endif
 
 #endif
