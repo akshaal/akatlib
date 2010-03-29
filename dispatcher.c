@@ -14,13 +14,12 @@
 #include "akat.h"
 
 #define MAX_TASKS 16
-#define FIRST_SLOT (&tasks[0])
-#define LAST_SLOT (&tasks[MAX_TASKS-1])
+#define LAST_TASK (MAX_TASKS - 1)
 
 static volatile task_t tasks[MAX_TASKS];
 
-static volatile task_t *free_slot = FIRST_SLOT;
-static volatile task_t *filled_slot = FIRST_SLOT;
+static volatile uint8_t free_slot = 0;
+static volatile uint8_t filled_slot = 0;
 static volatile uint8_t task_overflows = 0;
 
 /**
@@ -47,15 +46,19 @@ void akat_dispatcher_loop (task_t idle_task) {
         // Select task to run
         cli ();
 
+        // Here we can use not volatile versions
+        const uint8_t filled_slot_nv = (uint8_t) filled_slot;
+        const uint8_t free_slot_nv = (uint8_t) free_slot;
+
         task_t task_to_run;
-        if (free_slot == filled_slot) {
+        if (free_slot_nv == filled_slot_nv) {
             task_to_run = fixed_idle_task;
         } else {
-            task_to_run = *filled_slot;
-            if (filled_slot == LAST_SLOT) {
-                filled_slot = FIRST_SLOT;
+            task_to_run = tasks [filled_slot_nv];
+            if (filled_slot_nv == LAST_TASK) {
+                filled_slot = 0;
             } else {
-                filled_slot ++;
+                filled_slot = filled_slot_nv + 1;
             }
         }
 
@@ -73,16 +76,20 @@ uint8_t akat_dispatch (task_t task) {
     uint8_t rc;
 
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        volatile task_t *next_free_slot =
-                   free_slot == LAST_SLOT
-                           ? FIRST_SLOT
-                           : (free_slot + 1);
+        // Here we can use not volatile versions
+        const uint8_t filled_slot_nv = (uint8_t) filled_slot;
+        const uint8_t free_slot_nv = (uint8_t) free_slot;
 
-        if (next_free_slot == filled_slot) {
+        const uint8_t next_free_slot =
+                   free_slot_nv == LAST_TASK
+                           ? 0
+                           : (free_slot_nv + 1);
+
+        if (next_free_slot == filled_slot_nv) {
             task_overflows ++;
             rc = 1;
         } else {
-            *free_slot = task;
+            tasks [free_slot_nv] = task;
             free_slot = next_free_slot;
             rc = 0;
         }
@@ -98,17 +105,21 @@ uint8_t akat_dispatch_hi (task_t task) {
     uint8_t rc;
 
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        volatile task_t *new_filled_slot =
-                   filled_slot == FIRST_SLOT
-                           ? LAST_SLOT
-                           : (filled_slot - 1);
+        // Here we can use not volatile versions
+        const uint8_t filled_slot_nv = (uint8_t) filled_slot;
+        const uint8_t free_slot_nv = (uint8_t) free_slot;
 
-        if (new_filled_slot == free_slot) {
+        uint8_t new_filled_slot =
+                   filled_slot_nv == 0
+                           ? LAST_TASK
+                           : (filled_slot_nv - 1);
+
+        if (new_filled_slot == free_slot_nv) {
             task_overflows ++;
             rc = 1;
         } else {
             filled_slot = new_filled_slot;
-            *filled_slot = task;
+            tasks [new_filled_slot] = task;
             rc = 0;
         }
     }
