@@ -12,6 +12,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// Initializing declaration.
+#define AKAT_INIT(tasks_bits) \
+    volatile task_t tasks[1 << (tasks_bits)];                                   \
+                                                                                \
+    __ATTR_PURE__ __ATTR_CONST__ uint8_t akat_dispatcher_tasks_mask () {        \
+        return (1 << (tasks_bits)) - 1;                                         \
+    }
+
+// Declare debug flag functions by using one of definitions: AKAT_DUBUG_ON, AKAT_DEBUG_OFF.
+// AKAT_DEBUG_ON takes precedence of AKAT_DEBUG_OFF. So if both are defined, then
+// debug is considered ON. If none is defined, then debug state in unknown
+// (program can't be linked).
+
 #ifdef AKAT_DEBUG_ON
 uint8_t is_akat_debug_on () {return 1;}
 #else
@@ -21,11 +34,6 @@ uint8_t is_akat_debug_on () {return 0;}
 #endif
 
 #endif
-
-/**
- * Initialize akat library.
- */
-void akat_init ();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Debug
@@ -57,8 +65,20 @@ void akat_dispatcher_loop (task_t idle_task) __ATTR_NORETURN__;
 
 /**
  * Dispatch task. Returns 1 if task was discarded (because tasks queue is full).
+ * This function is supposed to be used only when interrupts are already disabled.
+ */
+uint8_t akat_dispatch_nonatomic (task_t task);
+
+/**
+ * Dispatch task. Returns 1 if task was discarded (because tasks queue is full).
  */
 uint8_t akat_dispatch (task_t task);
+
+/**
+ * Dispatch hi-priority task. Returns 1 if task was discarded (because tasks queue is full).
+ * This function is supposed to be used only when interrupts are already disabled.
+ */
+uint8_t akat_dispatch_hi_nonatomic (task_t task);
 
 /**
  * Dispatch hi-priority task. Returns 1 if task was discarded (because tasks queue is full).

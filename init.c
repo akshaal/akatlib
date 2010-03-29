@@ -13,9 +13,12 @@
 #include "dispatcher.h"
 
 /**
- * Initialize akat library.
+ * Initialize akat library. Always returns 0.
  */
-void akat_init () {
+ __attribute__ ((constructor))
+uint8_t akat_init_ () {
     akat_init_debug ();
     akat_init_dispatcher ();
+
+    return 0;
 }
