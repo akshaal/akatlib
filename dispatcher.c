@@ -18,6 +18,8 @@
 
 static volatile task_t tasks[MAX_TASKS];
 
+// We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
+// Code is much smaller this way (version with pointer were evaluated).
 static volatile uint8_t free_slot = 0;
 static volatile uint8_t filled_slot = 0;
 static volatile uint8_t task_overflows = 0;
