@@ -19,7 +19,7 @@
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
 
 // This is supposed to be defined in the main file, not in library.
-extern volatile task_t tasks[];
+extern volatile akat_task_t akat_tasks[];
 
 // We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
 // Code is much smaller this way (version with pointer were evaluated).
@@ -43,8 +43,8 @@ static void akat_dispatcher_default_idle_task () {
  * Dispatch tasks.
  */
 __ATTR_NORETURN__
-void akat_dispatcher_loop (task_t idle_task) {
-    task_t fixed_idle_task = idle_task ?: akat_dispatcher_default_idle_task;
+void akat_dispatcher_loop (akat_task_t idle_task) {
+    akat_task_t fixed_idle_task = idle_task ?: akat_dispatcher_default_idle_task;
 
     // Endless loop
     while (1) {
@@ -55,11 +55,11 @@ void akat_dispatcher_loop (task_t idle_task) {
         const uint8_t filled_slot_nv = (uint8_t) filled_slot;
         const uint8_t free_slot_nv = (uint8_t) free_slot;
 
-        task_t task_to_run;
+        akat_task_t task_to_run;
         if (free_slot_nv == filled_slot_nv) {
             task_to_run = fixed_idle_task;
         } else {
-            task_to_run = tasks [filled_slot_nv];
+            task_to_run = akat_tasks [filled_slot_nv];
             filled_slot = (filled_slot_nv + 1) & TASKS_MASK;
         }
 
@@ -74,7 +74,7 @@ void akat_dispatcher_loop (task_t idle_task) {
  * Dispatch task. If tasks queue is full, then task is discarded!
  * Non atomic. Must be used with interrupts already disabled!
  */
-uint8_t akat_dispatch_nonatomic (task_t task) {
+uint8_t akat_put_task_nonatomic (akat_task_t task) {
     uint8_t rc;
 
     // Here we can use not volatile versions
@@ -87,7 +87,7 @@ uint8_t akat_dispatch_nonatomic (task_t task) {
         task_overflows ++;
         rc = 1;
     } else {
-        tasks [free_slot_nv] = task;
+        akat_tasks [free_slot_nv] = task;
         free_slot = next_free_slot;
         rc = 0;
     }
@@ -98,11 +98,11 @@ uint8_t akat_dispatch_nonatomic (task_t task) {
 /**
  * Dispatch task. If tasks queue is full, then task is discarded!
  */
-uint8_t akat_dispatch (task_t task) {
+uint8_t akat_put_task (akat_task_t task) {
     uint8_t rc;
 
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_dispatch_nonatomic (task);
+        rc = akat_put_task_nonatomic (task);
     }
 
     return rc;
@@ -112,7 +112,7 @@ uint8_t akat_dispatch (task_t task) {
  * Dispatch task. If tasks queue is full, then task is discarded!
  * Non atomic. Must be used with interrupts already disabled!
  */
-uint8_t akat_dispatch_hi_nonatomic (task_t task) {
+uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
     uint8_t rc;
 
     // Here we can use not volatile versions
@@ -126,7 +126,7 @@ uint8_t akat_dispatch_hi_nonatomic (task_t task) {
         rc = 1;
     } else {
         filled_slot = new_filled_slot;
-        tasks [new_filled_slot] = task;
+        akat_tasks [new_filled_slot] = task;
         rc = 0;
     }
 
@@ -136,11 +136,11 @@ uint8_t akat_dispatch_hi_nonatomic (task_t task) {
 /**
  * Dispatch task. If tasks queue is full, then task is discarded!
  */
-uint8_t akat_dispatch_hi (task_t task) {
+uint8_t akat_put_hi_task (akat_task_t task) {
     uint8_t rc;
 
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_dispatch_hi_nonatomic (task);
+        rc = akat_put_hi_task_nonatomic (task);
     }
 
     return rc;

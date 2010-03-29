@@ -63,7 +63,7 @@ void akat_init_debug () {
 /**
  * Like vprintf but output is redirected to the debug stream.
  */
-void vdebugf (char *fmt, va_list ap) {
+void akat_vdebugf (char *fmt, va_list ap) {
     if (is_akat_debug_on ()) {
         vfprintf (&debug_out, fmt, ap);
     }
@@ -72,12 +72,12 @@ void vdebugf (char *fmt, va_list ap) {
 /**
  * Like printf but output is redirected to the debug stream.
  */
-void debugf (char *fmt, ...) {
+void akat_debugf (char *fmt, ...) {
     if (is_akat_debug_on ()) {
         va_list ap;
 
         va_start (ap, fmt);
-        vdebugf (fmt, ap);
+        akat_vdebugf (fmt, ap);
         va_end (ap);
     }
 }
@@ -85,7 +85,7 @@ void debugf (char *fmt, ...) {
 /**
  * Send string to the debug output.
  */
-void debug (char *str) {
+void akat_debug (char *str) {
     if (is_akat_debug_on ()) {
         fputs (str, &debug_out);
     }

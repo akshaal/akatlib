@@ -5,22 +5,12 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-// Initialization
-
-#include <stdint.h>
-
-#include "debug.h"
-#include "dispatcher.h"
-#include "timer.h"
+#ifndef AKAT_INTERNAL_TIMER_H_
+#define AKAT_INTERNAL_TIMER_H_
 
 /**
- * Initialize akat library. Always returns 0.
+ * Initialize timer.
  */
- __attribute__ ((constructor))
-uint8_t akat_init_ () {
-    akat_init_debug ();
-    akat_init_dispatcher ();
-    akat_init_timer ();
+void akat_init_timer ();
 
-    return 0;
-}
+#endif /* AKAT_INTERNAL_TIMER_H_ */

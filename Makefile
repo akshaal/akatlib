@@ -11,7 +11,7 @@ CFLAGS=-std=gnu99 -Wall -Os -fomit-frame-pointer \
        -flto
 VERSION=1.0
 
-OBJS = dispatcher.o debug.o state.o init.o
+OBJS = dispatcher.o debug.o state.o init.o timer.o
 LIBNAME = libakat-${MCU}-${VERSION}
 
 all: ${OBJS}
