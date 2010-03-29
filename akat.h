@@ -13,10 +13,10 @@
 #include <stdlib.h>
 
 // Initializing declaration.
-// freq - frequency
+// timer_freq - timer frequency
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
 // timers - maxium pending timers
-#define AKAT_INIT(freq, tasks, timers) \
+#define AKAT_INIT(timer_freq, tasks, timers)                                    \
     volatile akat_task_t akat_tasks [tasks];                                    \
     volatile akat_timer_t akat_timers [timers] = {{0}};                         \
                                                                                 \
