@@ -36,6 +36,16 @@ static int akat_debug_uart_putchar (char c, FILE *stream) {
     loop_until_bit_is_set (UCSR0A, UDRE0);
 
     UDR0 = c;
+#else
+#ifdef UCSRA
+    if (c == '\n') {
+        akat_debug_uart_putchar('\r', stream);
+    }
+
+    loop_until_bit_is_set (UCSRA, UDRE);
+
+    UDR = c;
+#endif
 #endif
 
     return 0;
