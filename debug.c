@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "debug.h"
 #include "state.h"
@@ -28,6 +29,7 @@ extern uint8_t is_akat_debug_on () __ATTR_PURE__ __ATTR_CONST__;
  * Send a char to the stream. Used to redirect debug output to the microcontroller's UART.
  */
 static int akat_debug_uart_putchar (char c, FILE *stream) {
+    // TODO: Fix bug here, this function must work correctly inside interrupts
 #ifdef UCSR0A
     if (c == '\n') {
         akat_debug_uart_putchar('\r', stream);
