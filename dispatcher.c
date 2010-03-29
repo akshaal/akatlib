@@ -13,10 +13,10 @@
 
 #include "akat.h"
 
-#define MAX_TASKS 16
-#define LAST_TASK (MAX_TASKS - 1)
+#define TASKS_BITS 4
+#define TASKS_MASK ((1 << TASKS_BITS) - 1)
 
-static volatile task_t tasks[MAX_TASKS];
+static volatile task_t tasks [1 << TASKS_BITS];
 
 // We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
 // Code is much smaller this way (version with pointer were evaluated).
@@ -57,11 +57,7 @@ void akat_dispatcher_loop (task_t idle_task) {
             task_to_run = fixed_idle_task;
         } else {
             task_to_run = tasks [filled_slot_nv];
-            if (filled_slot_nv == LAST_TASK) {
-                filled_slot = 0;
-            } else {
-                filled_slot = filled_slot_nv + 1;
-            }
+            filled_slot = (filled_slot_nv + 1) & TASKS_MASK;
         }
 
         sei ();
@@ -82,10 +78,7 @@ uint8_t akat_dispatch (task_t task) {
         const uint8_t filled_slot_nv = (uint8_t) filled_slot;
         const uint8_t free_slot_nv = (uint8_t) free_slot;
 
-        const uint8_t next_free_slot =
-                   free_slot_nv == LAST_TASK
-                           ? 0
-                           : (free_slot_nv + 1);
+        const uint8_t next_free_slot = (free_slot_nv + 1) & TASKS_MASK;
 
         if (next_free_slot == filled_slot_nv) {
             task_overflows ++;
@@ -111,10 +104,7 @@ uint8_t akat_dispatch_hi (task_t task) {
         const uint8_t filled_slot_nv = (uint8_t) filled_slot;
         const uint8_t free_slot_nv = (uint8_t) free_slot;
 
-        uint8_t new_filled_slot =
-                   filled_slot_nv == 0
-                           ? LAST_TASK
-                           : (filled_slot_nv - 1);
+        uint8_t new_filled_slot = (filled_slot_nv - 1) & TASKS_MASK;
 
         if (new_filled_slot == free_slot_nv) {
             task_overflows ++;
