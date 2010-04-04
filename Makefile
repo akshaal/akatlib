@@ -14,9 +14,14 @@ VERSION=1.0
 OBJS = dispatcher.o debug.o state.o init.o timer.o
 LIBNAME = libakat-${MCU}-${VERSION}
 
-all: ${OBJS}
+all: clean ${OBJS} benchmark
 
 distclean: clean
+
+benchmark: ${OBJS}
+	mkdir -p out/${LIBNAME}/
+	install -m 0644 ${OBJS} out/${LIBNAME}/
+	+make -C benchmark
 
 install: all
 	rm -rf ${PREFIX}/lib/${LIBNAME}/
@@ -25,4 +30,7 @@ install: all
 	install -m 0644 akat.h ${PREFIX}/include/akat-${VERSION}.h
 
 clean:
-	rm -f *.o *.i *.s *.a
+	rm -rf *.o *.i *.s *.a out
+	+make -C benchmark clean
+
+.PHONY : install benchmark clean
