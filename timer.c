@@ -38,10 +38,14 @@ void akat_handle_timers () {
 
     for (uint8_t i = akat_timers_count (); --i != 255; ) {
         akat_timer_t *current_timer = &akat_timers_nv[i];
-        akat_task_t task = current_timer->task;
 
-        if (task) {
-            if (!(--current_timer->time)) {
+        uint16_t time = current_timer->time;
+        if (time) {
+            time --;
+            current_timer->time = time;
+
+            if (!time) {
+                akat_task_t task = current_timer->task;
                 current_timer->task = 0;
 
                 if (current_timer->hi) {

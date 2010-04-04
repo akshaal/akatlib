@@ -12,6 +12,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// Registered used by akat:
+//    r3, r4 - dispatcher
+
 // Initializing declaration.
 // timer_freq - timer frequency
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
