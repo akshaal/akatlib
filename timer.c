@@ -34,11 +34,9 @@ void akat_init_timer () {
  * Must be called from interrupts only.
  */
 void akat_handle_timers () {
-    akat_timer_t *akat_timers_nv = (akat_timer_t*) akat_timers;
+    akat_timer_t *current_timer = (akat_timer_t*) akat_timers;
 
     for (uint8_t i = akat_timers_count (); --i != 255; ) {
-        akat_timer_t *current_timer = &akat_timers_nv[i];
-
         uint16_t time = current_timer->time;
         if (time) {
             time --;
@@ -55,6 +53,8 @@ void akat_handle_timers () {
                 }
             }
         }
+
+        current_timer += 1;
     }
 }
 

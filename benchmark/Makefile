@@ -13,7 +13,7 @@ all: clean OsO3
 
 distclean: clean
 
-PARTS=tasks timer
+PARTS=tasks timer1 timer2 timer4
 
 OsO3: ${patsubst %, O3-%.avr, ${PARTS}} ${patsubst %, Os-%.avr, ${PARTS}}
 	echo "" >> result-${MCU}
