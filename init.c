@@ -14,13 +14,10 @@
 #include "timer.h"
 
 /**
- * Initialize akat library. Always returns 0.
+ * Initialize akat library.
  */
- __attribute__ ((constructor))
-uint8_t akat_init_ () {
+void akat_init () {
     akat_init_debug ();
     akat_init_dispatcher ();
     akat_init_timer ();
-
-    return 0;
 }

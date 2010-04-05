@@ -31,6 +31,8 @@ static volatile uint8_t task_overflows = 0;
  * Initialize disptacher.
  */
 void akat_init_dispatcher () {
+    free_slot = 0;
+    filled_slot = 0;
 }
 
 /**

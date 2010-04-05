@@ -7,9 +7,9 @@
 #include "akat.h"
 #include "benchmark.h"
 
-AKAT_INIT(/* timer_frequency = */   1000000,
-          /* tasks = */             8,
-          /* timers = */            4)
+AKAT_DECLARE(/* timer_frequency = */   1000000,
+             /* tasks = */             8,
+             /* timers = */            4)
 
 void task () {
 }
@@ -18,6 +18,8 @@ void task2 () {
 }
 
 void main () {
+    akat_init ();
+
     BENCH_INIT
 
     BENCH

@@ -19,7 +19,7 @@
 // timer_freq - timer frequency
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
 // timers - maxium pending timers
-#define AKAT_INIT(timer_freq, tasks, timers)                                    \
+#define AKAT_DECLARE(timer_freq, tasks, timers)                                 \
     volatile akat_task_t akat_tasks [tasks];                                    \
     volatile akat_timer_t akat_timers [timers] = {{0}};                         \
                                                                                 \
@@ -31,6 +31,11 @@
         return timers;                                                          \
     }
 
+
+/**
+ * Initialize akat library.
+ */
+void akat_init ();
 
 // Declare debug flag functions by using one of definitions: AKAT_DUBUG_ON, AKAT_DEBUG_OFF.
 // AKAT_DEBUG_ON takes precedence of AKAT_DEBUG_OFF. So if both are defined, then

@@ -29,7 +29,7 @@ register uint8_t scheduled asm("r5");
  * Initialize disptacher.
  */
 void akat_init_timer () {
-    
+    scheduled = 0;   
 }
 
 /**
