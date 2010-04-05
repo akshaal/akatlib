@@ -19,8 +19,8 @@ OsO3: ${patsubst %, O3-%.avr, ${PARTS}} ${patsubst %, Os-%.avr, ${PARTS}}
 	echo "" >> result-${MCU}
 	date >> result-${MCU}
 	for name in `echo ${PARTS} | sed 's/ /\n/g'`; do \
-          ./benchmark.py ${MCU} Os $${name}; \
-          ./benchmark.py ${MCU} O3 $${name}; \
+          ./benchmark.py ${MCU} Os $${name} || true; \
+          ./benchmark.py ${MCU} O3 $${name} || true; \
         done
 
 Os-%.avr: %.c
