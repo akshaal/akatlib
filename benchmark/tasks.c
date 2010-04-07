@@ -7,7 +7,7 @@
 #include "akat.h"
 #include "benchmark.h"
 
-AKAT_DECLARE(/* timer_frequency = */   1000000,
+AKAT_DECLARE(/* cpu_frequency = */     8000000,
              /* tasks = */             8,
              /* timers = */            1)
 

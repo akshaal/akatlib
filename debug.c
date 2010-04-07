@@ -14,6 +14,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 
 #include "debug.h"
 #include "state.h"
@@ -29,26 +30,27 @@ extern uint8_t is_akat_debug_on () __ATTR_PURE__ __ATTR_CONST__;
  * Send a char to the stream. Used to redirect debug output to the microcontroller's UART.
  */
 static int akat_debug_uart_putchar (char c, FILE *stream) {
-    // TODO: Fix bug here, this function must work correctly inside interrupts
+   ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
 #ifdef UCSR0A
-    if (c == '\n') {
-        akat_debug_uart_putchar('\r', stream);
-    }
+        if (c == '\n') {
+            akat_debug_uart_putchar('\r', stream);
+        }
 
-    loop_until_bit_is_set (UCSR0A, UDRE0);
+        loop_until_bit_is_set (UCSR0A, UDRE0);
 
-    UDR0 = c;
+        UDR0 = c;
 #else
 #ifdef UCSRA
-    if (c == '\n') {
-        akat_debug_uart_putchar('\r', stream);
+        if (c == '\n') {
+            akat_debug_uart_putchar('\r', stream);
+        }
+
+        loop_until_bit_is_set (UCSRA, UDRE);
+
+        UDR = c;
+#endif
+#endif
     }
-
-    loop_until_bit_is_set (UCSRA, UDRE);
-
-    UDR = c;
-#endif
-#endif
 
     return 0;
 }
