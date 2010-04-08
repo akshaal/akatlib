@@ -22,8 +22,8 @@
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
 // timers - maxium pending timers
 #define AKAT_DECLARE(cpu_freq, tasks, timers)                                          \
-    volatile akat_task_t akat_tasks [tasks];                                           \
-    volatile akat_timer_t akat_timers [timers] = {{0}};                                \
+    volatile akat_task_t g_akat_tasks [tasks];                                         \
+    volatile akat_timer_t g_akat_timers [timers] = {{0}};                              \
                                                                                        \
     /* cpu freq */                                                                     \
     FORCE_INLINE uint32_t akat_cpu_freq_hz () {                                        \
