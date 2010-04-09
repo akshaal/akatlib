@@ -23,7 +23,7 @@ extern volatile akat_task_t g_akat_tasks[];
 
 // We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
 // Code is much smaller this way (version with pointer were evaluated).
-register uint8_t g_free_slot asm("r3");
+register uint8_t g_free_slot asm("r3");;
 register uint8_t g_filled_slot asm("r4");
 static volatile uint8_t g_task_overflows = 0;
 

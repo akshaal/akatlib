@@ -12,6 +12,8 @@ AKAT_DECLARE(/* cpu_frequency = */     8000000,
              /* timers = */            1)
 
 void idle () {
+    BENCH
+
     BENCH_EXIT
 }
 
