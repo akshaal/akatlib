@@ -139,22 +139,12 @@ uint8_t akat_dispatcher_overflows ();
 typedef struct {
     akat_task_t task;
     uint16_t time;
-    uint8_t hi;
 } akat_timer_t;
 
 /**
  * Handle timers. Should be called from a durable timer interrupt.
  */
 void akat_handle_timers ();
-
-/**
- * Schedule task for execution with hi priority.
- * If task is already scheduled, then task time is updated.
- * Returns 1 if task was discarded (because there are no free timer slots).
- *
- * This method should be called only with interrupts disabled.
- */
-uint8_t akat_schedule_hi_task_nonatomic (akat_task_t new_task, uint16_t new_time);
 
 /**
  * Schedule task for execution.
@@ -164,13 +154,6 @@ uint8_t akat_schedule_hi_task_nonatomic (akat_task_t new_task, uint16_t new_time
  * This method should be called only with interrupts disabled.
  */
 uint8_t akat_schedule_task_nonatomic (akat_task_t new_task, uint16_t new_time);
-
-/**
- * Schedule task for execution with hi priority.
- * If task is already scheduled, then task time is updated.
- * Returns 1 if task was discarded (because there are no free timer slots).
- */
-uint8_t akat_schedule_hi_task (akat_task_t new_task, uint16_t new_time);
 
 /**
  * Schedule task for execution.

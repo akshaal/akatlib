@@ -52,11 +52,7 @@ void akat_handle_timers () {
                 akat_task_t task = current_timer->task;
                 current_timer->task = 0;
 
-                if (current_timer->hi) {
-                    akat_put_hi_task_nonatomic (task);
-                } else {
-                    akat_put_task_nonatomic (task);
-                }
+                task ();
             }
         }
 
@@ -69,8 +65,7 @@ void akat_handle_timers () {
  * This method should be called only with interrupts disabled.
  */
 static uint8_t akat_schedule_task_nonatomic_with_prio (akat_task_t new_task,
-                                                       uint16_t new_time,
-                                                       uint8_t hi)
+                                                       uint16_t new_time)
 {
     akat_timer_t *use_timer = 0;
 
@@ -101,7 +96,6 @@ static uint8_t akat_schedule_task_nonatomic_with_prio (akat_task_t new_task,
 found:
     use_timer->task = new_task;
     use_timer->time = new_time;
-    use_timer->hi = hi;
     g_scheduled++;
 
     return 0;
@@ -110,22 +104,14 @@ found:
 /**
  * Schedule task for execution.
  */
-static uint8_t akat_schedule_task_with_prio (akat_task_t new_task, uint16_t new_time, uint8_t hi) {
+static uint8_t akat_schedule_task_with_prio (akat_task_t new_task, uint16_t new_time) {
     uint8_t rc;
 
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_schedule_task_nonatomic_with_prio (new_task, new_time, hi);
+        rc = akat_schedule_task_nonatomic_with_prio (new_task, new_time);
     }
 
     return rc;
-}
-
-/**
- * Schedule task for execution with hi priority.
- * This method should be called only with interrupts disabled.
- */
-uint8_t akat_schedule_hi_task_nonatomic (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_nonatomic_with_prio (new_task, new_time, 1);
 }
 
 /**
@@ -133,21 +119,14 @@ uint8_t akat_schedule_hi_task_nonatomic (akat_task_t new_task, uint16_t new_time
  * This method should be called only with interrupts disabled.
  */
 uint8_t akat_schedule_task_nonatomic (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_nonatomic_with_prio (new_task, new_time, 0);
-}
-
-/**
- * Schedule task for execution with hi priority.
- */
-uint8_t akat_schedule_hi_task (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_with_prio (new_task, new_time, 1);
+    return akat_schedule_task_nonatomic_with_prio (new_task, new_time);
 }
 
 /**
  * Schedule task for execution.
  */
 uint8_t akat_schedule_task (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_with_prio (new_task, new_time, 0);
+    return akat_schedule_task_with_prio (new_task, new_time);
 }
 
 /**
