@@ -21,15 +21,15 @@ void main () {
 
     BENCH
 
-    akat_schedule_task (task, 1);
+    akat_schedule_stimer (task, 1);
 
     BENCH
 
-    akat_handle_timers (); 
+    akat_handle_stimers (); 
 
     BENCH
 
-    akat_handle_timers (); 
+    akat_handle_stimers (); 
 
     BENCH
 

@@ -13,15 +13,15 @@
 
 #include "akat.h"
 
-#define TIMERS_MASK (akat_timers_mask ())
+#define STIMERS_MASK (akat_stimers_mask ())
 
 // This is defined by user
-extern uint8_t akat_timers_count () __ATTR_PURE__ __ATTR_CONST__;
+extern uint8_t akat_stimers_count () __ATTR_PURE__ __ATTR_CONST__;
 
 // This is supposed to be defined in the main file, not in library.
-extern volatile akat_timer_t g_akat_timers[];
+extern volatile akat_stimer_t g_akat_stimers[];
 
-static volatile uint8_t g_timer_overflows = 0;
+static volatile uint8_t g_stimer_overflows = 0;
 
 register uint8_t g_scheduled asm("r5");
 
@@ -33,105 +33,86 @@ void akat_init_timer () {
 }
 
 /**
- * Check timers. Execute timers that are ready to be executed.
+ * Check soft timers. Execute soft timers that are ready to be executed.
  * Must be called from interrupts only.
  */
-void akat_handle_timers () {
-    akat_timer_t *current_timer = (akat_timer_t*) g_akat_timers;
+void akat_handle_stimers () {
+    akat_stimer_t *current_stimer = (akat_stimer_t*) g_akat_stimers;
 
     uint8_t to_visit = g_scheduled;
-    for (uint8_t i = akat_timers_count (); to_visit != 0 && --i != 255;) {
-        uint16_t time = current_timer->time;
+    for (uint8_t i = akat_stimers_count (); to_visit != 0 && --i != 255;) {
+        uint16_t time = current_stimer->time;
         if (time) {
             time--;
             to_visit--;
-            current_timer->time = time;
+            current_stimer->time = time;
 
             if (!time) {
                 g_scheduled--;
-                akat_task_t task = current_timer->task;
-                current_timer->task = 0;
+                akat_stimerf_t stimerf = current_stimer->stimerf;
+                current_stimer->stimerf = 0;
 
-                task ();
+                stimerf ();
             }
         }
 
-        current_timer++;
+        current_stimer++;
     }
 }
 
 /**
- * Schedule task for execution.
+ * Schedule soft timer for execution.
  * This method should be called only with interrupts disabled.
  */
-static uint8_t akat_schedule_task_nonatomic_with_prio (akat_task_t new_task,
-                                                       uint16_t new_time)
+uint8_t akat_schedule_stimer_nonatomic (akat_stimerf_t new_stimerf,
+                                               uint16_t new_time)
 {
-    akat_timer_t *use_timer = 0;
+    akat_stimer_t *use_stimer = 0;
 
     uint8_t to_visit = g_scheduled;
-    akat_timer_t *current_timer = (akat_timer_t*) g_akat_timers;
-    for (uint8_t i = akat_timers_count (); --i != 255; ) {
-        akat_task_t current_task = current_timer->task;
+    akat_stimer_t *current_stimer = (akat_stimer_t*) g_akat_stimers;
+    for (uint8_t i = akat_stimers_count (); --i != 255; ) {
+        akat_stimerf_t current_stimerf = current_stimer->stimerf;
 
-        if (current_task) {
-            if (current_task == new_task) {
-                use_timer = current_timer;
+        if (current_stimerf) {
+            if (current_stimerf == new_stimerf) {
+                use_stimer = current_stimer;
                 goto found;
             }
             to_visit--;
         } else {
-            use_timer = current_timer;
+            use_stimer = current_stimer;
             if (to_visit == 0) {
                 goto found;
             }
         }
 
-        current_timer++;
+        current_stimer++;
     }
 
-    g_timer_overflows++;
+    g_stimer_overflows++;
     return 1;
 
 found:
-    use_timer->task = new_task;
-    use_timer->time = new_time;
+    use_stimer->stimerf = new_stimerf;
+    use_stimer->time = new_time;
     g_scheduled++;
 
     return 0;
 }
 
 /**
- * Schedule task for execution.
+ * Schedule soft timer for execution.
  */
-static uint8_t akat_schedule_task_with_prio (akat_task_t new_task, uint16_t new_time) {
-    uint8_t rc;
-
+uint8_t akat_schedule_stimer (akat_stimerf_t new_stimer, uint16_t new_time) {
     ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_schedule_task_nonatomic_with_prio (new_task, new_time);
+        return akat_schedule_stimer_nonatomic (new_stimer, new_time);
     }
-
-    return rc;
-}
-
-/**
- * Schedule task for execution.
- * This method should be called only with interrupts disabled.
- */
-uint8_t akat_schedule_task_nonatomic (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_nonatomic_with_prio (new_task, new_time);
-}
-
-/**
- * Schedule task for execution.
- */
-uint8_t akat_schedule_task (akat_task_t new_task, uint16_t new_time) {
-    return akat_schedule_task_with_prio (new_task, new_time);
 }
 
 /**
  * Returns number of overflows.
  */
-uint8_t akat_timers_overflows () {
-    return g_timer_overflows;
+uint8_t akat_schedule_overflows () {
+    return g_stimer_overflows;
 }

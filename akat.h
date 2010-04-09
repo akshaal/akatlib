@@ -20,10 +20,10 @@
 // Initializing declaration.
 // cpu_freq - timer frequency
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
-// timers - maxium pending timers
-#define AKAT_DECLARE(cpu_freq, tasks, timers)                                          \
+// stimers - maxium pending soft timers
+#define AKAT_DECLARE(cpu_freq, tasks, stimers)                                         \
     volatile akat_task_t g_akat_tasks [tasks];                                         \
-    volatile akat_timer_t g_akat_timers [timers] = {{0}};                              \
+    volatile akat_stimer_t g_akat_stimers [stimers] = {{0}};                           \
                                                                                        \
     /* cpu freq */                                                                     \
     FORCE_INLINE uint32_t akat_cpu_freq_hz () {                                        \
@@ -43,9 +43,9 @@
         return tasks - 1;                                                              \
     }                                                                                  \
                                                                                        \
-    /* timers count */                                                                 \
-    FORCE_INLINE uint8_t akat_timers_count () {                                        \
-        return timers;                                                                 \
+    /* soft timers count */                                                            \
+    FORCE_INLINE uint8_t akat_stimers_count () {                                       \
+        return stimers;                                                                \
     }
 
 
@@ -134,38 +134,40 @@ uint8_t akat_put_hi_task (akat_task_t task);
 uint8_t akat_dispatcher_overflows ();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Dispatcher
+// Soft timers
+
+typedef void (*akat_stimerf_t)(void);
 
 typedef struct {
-    akat_task_t task;
+    akat_stimerf_t stimerf;
     uint16_t time;
-} akat_timer_t;
+} akat_stimer_t;
 
 /**
  * Handle timers. Should be called from a durable timer interrupt.
  */
-void akat_handle_timers ();
+void akat_handle_stimers ();
 
 /**
- * Schedule task for execution.
- * If task is already scheduled, then task time is updated.
- * Returns 1 if task was discarded (because there are no free timer slots).
+ * Schedule soft timer for execution.
+ * If soft timer is already scheduled, then the soft timer's time is updated.
+ * Returns 1 if the soft timer was discarded (because there are no free timer slots).
  *
  * This method should be called only with interrupts disabled.
  */
-uint8_t akat_schedule_task_nonatomic (akat_task_t new_task, uint16_t new_time);
+uint8_t akat_schedule_stimer_nonatomic (akat_stimerf_t new_stimerf, uint16_t new_time);
 
 /**
- * Schedule task for execution.
- * If task is already scheduled, then task time is updated.
- * Returns 1 if task was discarded (because there are no fr1ee timer slots).
+ * Schedule soft timer for execution.
+ * If soft timer is already scheduled, then soft timer's time is updated.
+ * Returns 1 if the soft timer was discarded (because there are no free timer slots).
  */
-uint8_t akat_schedule_task (akat_task_t new_task, uint16_t new_time);
+uint8_t akat_schedule_stimer (akat_stimerf_t new_stimerf, uint16_t new_time);
 
 /**
  * Returns number of overflows for timers.
  */
-uint8_t akat_timers_overflows ();
+uint8_t akat_schedule_overflows ();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // HW Timers

@@ -50,3 +50,13 @@ Os   timer2: size = 368, timings = [45, 57, 114, 102, 28]
 O3   timer2: size = 754, timings = [36, 52, 61, 45, 6]
 Os   timer4: size = 352, timings = [60, 84, 114, 102, 28]
 O3   timer4: size = 1250, timings = [36, 52, 68, 49, 7]
+
+Fri Apr  9 11:59:02 EEST 2010
+Os   tasks: size = 354, timings = [32, 32, 33, 33, 27, 33, 33, 33]
+O3   tasks: size = 366, timings = [9, 11, 15, 25, 28, 30, 30, 30]
+Os   timer1: size = 276, timings = [23, 38, 11]
+O3   timer1: size = 360, timings = [26, 35, 6]
+Os   timer2: size = 378, timings = [46, 58, 114, 102, 28]
+O3   timer2: size = 758, timings = [36, 54, 60, 46, 5]
+Os   timer4: size = 358, timings = [57, 81, 114, 102, 28]
+O3   timer4: size = 1232, timings = [36, 56, 61, 50, 6]
