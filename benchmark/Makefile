@@ -1,13 +1,13 @@
 HOST = avr
-CC = ${HOST}-gcc
+CXX = ${HOST}-g++
 OBJDUMP = ${HOST}-objdump
 VERSION=1.0
-CFLAGS=-std=gnu99 -Wall -fomit-frame-pointer \
-        -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
-        -fshort-enums  -Wl,--relax -ffreestanding \
-        -fno-tree-scev-cprop -fno-strict-aliasing -mmcu=${MCU} \
-        -flto -fwhole-program -Wl,-gc-sections -ffunction-sections \
-        -fdata-sections -mcall-prologues
+CXXFLAGS=-std=gnu++0x -Wall -fomit-frame-pointer \
+         -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
+         -fshort-enums  -Wl,--relax -ffreestanding \
+         -fno-tree-scev-cprop -fno-strict-aliasing -mmcu=${MCU} \
+         -flto -fwhole-program -Wl,-gc-sections -ffunction-sections \
+         -fdata-sections -mcall-prologues
 
 all: clean OsO3
 
@@ -23,12 +23,12 @@ OsO3: ${patsubst %, O3-%.avr, ${PARTS}} ${patsubst %, Os-%.avr, ${PARTS}}
           ./benchmark.py ${MCU} O3 $${name} || true; \
         done
 
-Os-%.avr: %.c
-	${CC} ${CFLAGS} -Os -I../ $< -DAKAT_DEBUG_OFF -save-temps -o $@ ../*.o
+Os-%.avr: %.cpp
+	${CXX} ${CXXFLAGS} -Os -I../ $< -DAKAT_DEBUG_OFF -save-temps -o $@ ../*.o
 	${OBJDUMP} -d $@ > $@.s
 
-O3-%.avr: %.c
-	${CC} ${CFLAGS} -O3 -I../ $< -DAKAT_DEBUG_OFF -save-temps -o $@ ../*.o
+O3-%.avr: %.cpp
+	${CXX} ${CXXFLAGS} -O3 -I../ $< -DAKAT_DEBUG_OFF -save-temps -o $@ ../*.o
 	${OBJDUMP} -d $@ > $@.s
 
 clean:

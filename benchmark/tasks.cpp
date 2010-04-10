@@ -7,31 +7,32 @@
 #include "akat.h"
 #include "benchmark.h"
 
-AKAT_DECLARE(/* cpu_frequency = */     8000000,
-             /* tasks = */             8,
-             /* timers = */            1)
-
-void idle () {
+void idle (void) {
     BENCH
 
     BENCH_EXIT
 }
 
-void task () {
+static void task (void) {
     BENCH
 }
 
-void task2 () {
+static void task2 (void) {
     BENCH
 }
 
-void task_hi () {
+static void task_hi (void) {
     BENCH
 }
 
-void task2_hi () {
+static void task2_hi (void) {
     BENCH
 }
+
+AKAT_DECLARE(/* cpu_frequency = */              8000000,
+             /* tasks = */                      8,
+             /* dispatcher_idle_code = */       idle(),
+             /* dispatcher_overflow_code = */   )
 
 __ATTR_NORETURN__
 void main () {
@@ -57,5 +58,5 @@ void main () {
 
     BENCH
 
-    akat_dispatcher_loop (idle);
+    akat_dispatcher_loop ();
 }

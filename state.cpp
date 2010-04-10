@@ -12,5 +12,4 @@
 /**
  * State of akat library.
  */
-akat_state_t akat_state = {
-};
+akat_state_t akat_state;

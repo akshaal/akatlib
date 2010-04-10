@@ -15,39 +15,35 @@
 
 #define TASKS_MASK (akat_dispatcher_tasks_mask ())
 
-// This is defined by user
+// This is defined by user to provide mask for tasks count
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
 
+// Defined by user to run code when dispatcher is idle.
+extern void akat_dispatcher_idle ();
+
+// Defined by user to handle a case when too many task are added to the dispatcher.
+extern void akat_dispatcher_overflow ();
+
 // This is supposed to be defined in the main file, not in library.
+// Array of tasks.
 extern volatile akat_task_t g_akat_tasks[];
 
 // We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
 // Code is much smaller this way (version with pointer were evaluated).
-register uint8_t g_free_slot asm("r3");;
-register uint8_t g_filled_slot asm("r4");
-static volatile uint8_t g_task_overflows = 0;
+register uint8_t g_free_slot asm("r4");;
+register uint8_t g_filled_slot asm("r5");
 
 /**
  * Initialize disptacher.
  */
 void akat_init_dispatcher () {
-    g_free_slot = 0;
-    g_filled_slot = 0;
-}
-
-/**
- * Default idle task. Does nothing.
- */
-static void akat_dispatcher_default_idle_task () {
 }
 
 /**
  * Dispatch tasks.
  */
 __ATTR_NORETURN__
-void akat_dispatcher_loop (akat_task_t idle_task) {
-    akat_task_t fixed_idle_task = idle_task ?: akat_dispatcher_default_idle_task;
-
+void akat_dispatcher_loop () {
     // Endless loop
     while (1) {
         // Select task to run
@@ -57,18 +53,15 @@ void akat_dispatcher_loop (akat_task_t idle_task) {
         const uint8_t filled_slot_nv = (uint8_t) g_filled_slot;
         const uint8_t free_slot_nv = (uint8_t) g_free_slot;
 
-        akat_task_t task_to_run;
         if (free_slot_nv == filled_slot_nv) {
-            task_to_run = fixed_idle_task;
+            sei ();
+            akat_dispatcher_idle ();
         } else {
-            task_to_run = g_akat_tasks [filled_slot_nv];
+            akat_task_t task_to_run = g_akat_tasks [filled_slot_nv];
             g_filled_slot = (filled_slot_nv + 1) & TASKS_MASK;
+            sei ();
+            task_to_run ();
         }
-
-        sei ();
-
-        // Run task
-        task_to_run ();
     }
 }
 
@@ -86,7 +79,7 @@ uint8_t akat_put_task_nonatomic (akat_task_t task) {
     const uint8_t next_free_slot = (free_slot_nv + 1) & TASKS_MASK;
 
     if (next_free_slot == filled_slot_nv) {
-        g_task_overflows ++;
+        akat_dispatcher_overflow ();
         rc = 1;
     } else {
         g_akat_tasks [free_slot_nv] = task;
@@ -124,7 +117,7 @@ uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
     uint8_t new_filled_slot = (filled_slot_nv - 1) & TASKS_MASK;
 
     if (new_filled_slot == free_slot_nv) {
-        g_task_overflows ++;
+        akat_dispatcher_overflow ();     
         rc = 1;
     } else {
         g_filled_slot = new_filled_slot;
@@ -146,11 +139,4 @@ uint8_t akat_put_hi_task (akat_task_t task) {
     }
 
     return rc;
-}
-
-/**
- * Returns number of overflows.
- */
-uint8_t akat_dispatcher_overflows () {
-    return g_task_overflows;
 }

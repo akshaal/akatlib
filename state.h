@@ -17,6 +17,6 @@ typedef struct {
 /**
  * State instance.
  */
-akat_state_t akat_state;
+extern akat_state_t akat_state;
 
 #endif

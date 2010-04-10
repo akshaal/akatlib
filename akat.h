@@ -13,24 +13,27 @@
 #include <stdlib.h>
 
 // Registered used by akat:
-//    r3, r4 - dispatcher
+//    r3 - holds 1
+//    r4, r5 - dispatcher
 
 #define FORCE_INLINE    __attribute__ ((always_inline))
 
 // Initializing declaration.
 // cpu_freq - timer frequency
 // tasks - maximum number of tasks in queue (allowed values: 1, 2, 4, 8, 16, 32, 64, 128).
-// stimers - maxium pending soft timers
-#define AKAT_DECLARE(cpu_freq, tasks, stimers)                                         \
+// dispatcher_idle_code - code to run when dispatcher is idle
+#define AKAT_DECLARE(cpu_freq,                                                         \
+                     tasks,                                                            \
+                     dispatcher_idle_code,                                             \
+                     dispatcher_overflow_code)                                         \
     volatile akat_task_t g_akat_tasks [tasks];                                         \
-    volatile akat_stimer_t g_akat_stimers [stimers] = {{0}};                           \
                                                                                        \
-    /* cpu freq */                                                                     \
+    /* CPU freq */                                                                     \
     FORCE_INLINE uint32_t akat_cpu_freq_hz () {                                        \
         return cpu_freq;                                                               \
     }                                                                                  \
                                                                                        \
-    /* tasks mask */                                                                   \
+    /* Tasks count mask */                                                             \
     __attribute__ ((error("Tasks count must be one of the following: 1,2,4,8,16,32"))) \
     extern void akat_dispatcher_error_ ();                                             \
                                                                                        \
@@ -43,10 +46,15 @@
         return tasks - 1;                                                              \
     }                                                                                  \
                                                                                        \
-    /* soft timers count */                                                            \
-    FORCE_INLINE uint8_t akat_stimers_count () {                                       \
-        return stimers;                                                                \
-    }
+    /* Code to run when dispatcher is idle. */                                         \
+    FORCE_INLINE void akat_dispatcher_idle () {                                        \
+        dispatcher_idle_code;                                                          \
+    }                                                                                  \
+                                                                                       \
+    /* Code to run when dispatcher overflowed. */                                      \
+    FORCE_INLINE void akat_dispatcher_overflow () {                                    \
+        dispatcher_overflow_code;                                                      \
+    }                                                                                  
 
 
 /**
@@ -78,6 +86,9 @@ extern uint32_t akat_cpu_freq_hz ();
 // Convert frequency to usecs
 #define freq2usecs(freq) (((uint32_t)1000000) / ((uint32_t)(freq)))
 
+// Misc. Concatenate two names
+#define AKAT_CONCAT(a, b)     a##b
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Debug
 
@@ -102,9 +113,9 @@ void akat_debug (char *str);
 typedef void (*akat_task_t)(void);
 
 /**
- * Dispatch tasks. When no tasks to dispatch, then run idle_task until there are tasks to dispatch.
+ * Dispatch tasks.
  */
-void akat_dispatcher_loop (akat_task_t idle_task) __ATTR_NORETURN__;
+void akat_dispatcher_loop () __ATTR_NORETURN__;
 
 /**
  * Dispatch task. Returns 1 if task was discarded (because tasks queue is full).
@@ -128,46 +139,10 @@ uint8_t akat_put_hi_task_nonatomic (akat_task_t task);
  */
 uint8_t akat_put_hi_task (akat_task_t task);
 
-/**
- * Returns number of overflows.
- */
-uint8_t akat_dispatcher_overflows ();
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Soft timers
 
-typedef void (*akat_stimerf_t)(void);
 
-typedef struct {
-    akat_stimerf_t stimerf;
-    uint16_t time;
-} akat_stimer_t;
-
-/**
- * Handle timers. Should be called from a durable timer interrupt.
- */
-void akat_handle_stimers ();
-
-/**
- * Schedule soft timer for execution.
- * If soft timer is already scheduled, then the soft timer's time is updated.
- * Returns 1 if the soft timer was discarded (because there are no free timer slots).
- *
- * This method should be called only with interrupts disabled.
- */
-uint8_t akat_schedule_stimer_nonatomic (akat_stimerf_t new_stimerf, uint16_t new_time);
-
-/**
- * Schedule soft timer for execution.
- * If soft timer is already scheduled, then soft timer's time is updated.
- * Returns 1 if the soft timer was discarded (because there are no free timer slots).
- */
-uint8_t akat_schedule_stimer (akat_stimerf_t new_stimerf, uint16_t new_time);
-
-/**
- * Returns number of overflows for timers.
- */
-uint8_t akat_schedule_overflows ();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // HW Timers
@@ -294,5 +269,26 @@ inline void akat_call_with_prescaler_and_resolutions (uint32_t usA,
 
     f (prescaler, resolutionA, resolutionB);
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// GPIO
+
+#define AKAT_DEFINE_PIN_ACCESS_FUNC(name, reg, port_char, pin_idx)       \
+   FORCE_INLINE uint8_t is_##name () {                                   \
+       return AKAT_CONCAT(reg, port_char) & (1 << pin_idx);              \
+   }                                                                     \
+                                                                         \
+   FORCE_INLINE void set_##name (uint8_t state) {                        \
+       if (state) {                                                      \
+           AKAT_CONCAT(reg, port_char) |= 1 << pin_idx;                  \
+       } else {                                                          \
+           AKAT_CONCAT(reg, port_char) &= ~(1 << pin_idx);               \
+       }                                                                 \
+   }
+
+#define AKAT_DEFINE_PIN(name, port_char, pin_idx)                        \
+    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_port, PORT, port_char, pin_idx)   \
+    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_ddr, DDR, port_char, pin_idx)     \
+    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_pin, PIN, port_char, pin_idx)
 
 #endif
