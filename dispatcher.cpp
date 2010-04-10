@@ -13,8 +13,6 @@
 
 #include "akat.h"
 
-#define TASKS_MASK (akat_dispatcher_tasks_mask ())
-
 // This is defined by user to provide mask for tasks count
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
 
@@ -32,11 +30,13 @@ extern volatile akat_task_t g_akat_tasks[];
 // Code is much smaller this way (version with pointer were evaluated).
 register uint8_t g_free_slot asm("r4");;
 register uint8_t g_filled_slot asm("r5");
+register uint8_t g_slots asm("r6");
 
 /**
  * Initialize disptacher.
  */
 void akat_init_dispatcher () {
+    g_slots = akat_dispatcher_tasks_mask ();
 }
 
 /**
@@ -49,16 +49,15 @@ void akat_dispatcher_loop () {
         // Select task to run
         cli ();
 
-        // Here we can use not volatile versions
-        const uint8_t filled_slot_nv = (uint8_t) g_filled_slot;
-        const uint8_t free_slot_nv = (uint8_t) g_free_slot;
-
-        if (free_slot_nv == filled_slot_nv) {
+        if (g_free_slot == g_filled_slot) {
             sei ();
             akat_dispatcher_idle ();
         } else {
-            akat_task_t task_to_run = g_akat_tasks [filled_slot_nv];
-            g_filled_slot = (filled_slot_nv + 1) & TASKS_MASK;
+            akat_task_t task_to_run = g_akat_tasks [g_filled_slot];
+
+            AKAT_INC_REG (g_filled_slot);
+            g_filled_slot &= g_slots;
+
             sei ();
             task_to_run ();
         }
@@ -70,24 +69,16 @@ void akat_dispatcher_loop () {
  * Non atomic. Must be used with interrupts already disabled!
  */
 uint8_t akat_put_task_nonatomic (akat_task_t task) {
-    uint8_t rc;
+    uint8_t next_free_slot = (g_free_slot + 1) & g_slots;
 
-    // Here we can use not volatile versions
-    const uint8_t filled_slot_nv = (uint8_t) g_filled_slot;
-    const uint8_t free_slot_nv = (uint8_t) g_free_slot;
-
-    const uint8_t next_free_slot = (free_slot_nv + 1) & TASKS_MASK;
-
-    if (next_free_slot == filled_slot_nv) {
+    if (next_free_slot == g_filled_slot) {
         akat_dispatcher_overflow ();
-        rc = 1;
+        return 1;
     } else {
-        g_akat_tasks [free_slot_nv] = task;
+        g_akat_tasks [g_free_slot] = task;
         g_free_slot = next_free_slot;
-        rc = 0;
+        return 0;
     }
-
-    return rc;
 }
 
 /**
@@ -108,24 +99,16 @@ uint8_t akat_put_task (akat_task_t task) {
  * Non atomic. Must be used with interrupts already disabled!
  */
 uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
-    uint8_t rc;
+    uint8_t new_filled_slot = (g_filled_slot - 1) & g_slots;
 
-    // Here we can use not volatile versions
-    const uint8_t filled_slot_nv = (uint8_t) g_filled_slot;
-    const uint8_t free_slot_nv = (uint8_t) g_free_slot;
-
-    uint8_t new_filled_slot = (filled_slot_nv - 1) & TASKS_MASK;
-
-    if (new_filled_slot == free_slot_nv) {
+    if (new_filled_slot == g_free_slot) {
         akat_dispatcher_overflow ();     
-        rc = 1;
+        return 1;
     } else {
         g_filled_slot = new_filled_slot;
         g_akat_tasks [new_filled_slot] = task;
-        rc = 0;
+        return 0;
     }
-
-    return rc;
 }
 
 /**

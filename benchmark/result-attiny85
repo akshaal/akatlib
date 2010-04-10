@@ -240,3 +240,73 @@ Os   timer2: size = 100, timings = []
 O3   timer2: size = 100, timings = []
 Os   timer4: size = 100, timings = []
 O3   timer4: size = 100, timings = []
+
+Sat Apr 10 17:44:21 EEST 2010
+Os   tasks: size = 308, timings = [33, 33, 34, 34, 28, 32, 32, 32, 12]
+O3   tasks: size = 366, timings = [24, 24, 25, 25, 31, 31, 31, 31, 11]
+Os   timer1: size = 100, timings = []
+O3   timer1: size = 100, timings = []
+Os   timer2: size = 100, timings = []
+O3   timer2: size = 100, timings = []
+Os   timer4: size = 100, timings = []
+O3   timer4: size = 100, timings = []
+
+Sat Apr 10 17:47:14 EEST 2010
+Os   tasks: size = 304, timings = [33, 33, 34, 34, 26, 30, 30, 30, 12]
+O3   tasks: size = 362, timings = [24, 24, 25, 25, 29, 29, 29, 29, 11]
+Os   timer1: size = 100, timings = []
+O3   timer1: size = 100, timings = []
+Os   timer2: size = 100, timings = []
+O3   timer2: size = 100, timings = []
+Os   timer4: size = 100, timings = []
+O3   timer4: size = 100, timings = []
+
+Sat Apr 10 17:50:52 EEST 2010
+Os   tasks: size = 306, timings = [33, 33, 34, 34, 25, 29, 29, 29, 12]
+O3   tasks: size = 364, timings = [24, 24, 25, 25, 28, 28, 28, 28, 11]
+Os   timer1: size = 104, timings = []
+O3   timer1: size = 104, timings = []
+Os   timer2: size = 104, timings = []
+O3   timer2: size = 104, timings = []
+Os   timer4: size = 104, timings = []
+O3   timer4: size = 104, timings = []
+
+Sat Apr 10 17:59:01 EEST 2010
+Os   tasks: size = 304, timings = [33, 33, 33, 33, 25, 29, 29, 158, 33, 33, 33, 33, 25, 29, 158, 33, 33, 33, 33, 25, 29, 29, 12]
+O3   tasks: size = 360, timings = [24, 24, 24, 24, 28, 28, 28, 157, 24, 24, 24, 24, 28, 28, 157, 24, 24, 24, 24, 28, 28, 28, 11]
+Os   timer1: size = 104, timings = []
+O3   timer1: size = 104, timings = []
+Os   timer2: size = 104, timings = []
+O3   timer2: size = 104, timings = []
+Os   timer4: size = 104, timings = []
+O3   timer4: size = 104, timings = []
+
+Sat Apr 10 18:18:30 EEST 2010
+Os   tasks: size = 304, timings = [33, 33, 33, 33, 25, 29, 29, 158, 33, 33, 33, 33, 25, 29, 158, 33, 33, 33, 33, 25, 29, 29, 12]
+O3   tasks: size = 360, timings = [24, 24, 24, 24, 28, 28, 28, 157, 24, 24, 24, 24, 28, 28, 157, 24, 24, 24, 24, 28, 28, 28, 11]
+Os   timer1: size = 104, timings = []
+O3   timer1: size = 104, timings = []
+Os   timer2: size = 104, timings = []
+O3   timer2: size = 104, timings = []
+Os   timer4: size = 104, timings = []
+O3   timer4: size = 104, timings = []
+
+Sat Apr 10 18:21:55 EEST 2010
+Os   tasks: size = 306, timings = [33, 33, 34, 34, 25, 29, 29, 29, 12]
+O3   tasks: size = 364, timings = [24, 24, 25, 25, 28, 28, 28, 28, 11]
+Os   timer1: size = 104, timings = []
+O3   timer1: size = 104, timings = []
+Os   timer2: size = 104, timings = []
+O3   timer2: size = 104, timings = []
+Os   timer4: size = 104, timings = []
+O3   timer4: size = 104, timings = []
+
+Sat Apr 10 18:24:37 EEST 2010
+Os   tasks: size = 306, timings = [33, 33, 34, 34, 25, 29, 29, 29, 12]
+O3   tasks: size = 364, timings = [24, 24, 25, 25, 28, 28, 28, 28, 11]
+Os   timer1: size = 104, timings = []
+O3   timer1: size = 104, timings = []
+Os   timer2: size = 104, timings = []
+O3   timer2: size = 104, timings = []
+Os   timer4: size = 104, timings = []
+O3   timer4: size = 104, timings = []

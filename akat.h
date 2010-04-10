@@ -89,6 +89,10 @@ extern uint32_t akat_cpu_freq_hz ();
 // Misc. Concatenate two names
 #define AKAT_CONCAT(a, b)     a##b
 
+// Fast increment/decrement
+#define AKAT_INC_REG(reg) asm ("inc %0" : "=r" (reg) : "r" (reg));
+#define AKAT_DEC_REG(reg) asm ("dec %0" : "=r" (reg) : "r" (reg));
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Debug
 
