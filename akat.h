@@ -244,7 +244,7 @@ inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2, Timer3 &timer3
                                                                               \
     FORCE_INLINE void __soft_timer_##name##_f__ ();                           \
                                                                               \
-    struct __soft_timer_##name##_t__ {                                        \
+    struct name##_t {                                                         \
         FORCE_INLINE void set (uint8_t time) {                                \
             __soft_timer_##name##_counter__ = time;                           \
         }                                                                     \
