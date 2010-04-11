@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include "akat.h"
+
 #include "debug.h"
 #include "dispatcher.h"
 #include "timer.h"
@@ -17,6 +19,8 @@
  * Initialize akat library.
  */
 void akat_init () {
+    akat_one__  = 1;
+
     akat_init_debug ();
     akat_init_dispatcher ();
     akat_init_timer ();
