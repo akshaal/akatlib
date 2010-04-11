@@ -151,6 +151,126 @@ uint8_t akat_put_hi_task (akat_task_t task);
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Soft timers
 
+/**
+ * Trigger soft timers.
+ */
+template<typename Timer>
+inline void akat_trigger_stimers (Timer &timer) {
+    if (!timer.decrement_and_check ()) {
+        timer.run ();
+    }
+};
+
+/**
+ * Trigger soft timers.
+ */
+template<typename Timer1, typename Timer2>
+inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2) {
+    // First step: Check all timers.
+
+    uint8_t r1 = timer1.decrement_and_check ();
+    uint8_t r2 = timer2.decrement_and_check ();
+
+    // Second step: Run triggered tasks
+
+    if (!r1) {
+        timer1.run ();
+    }
+
+    if (!r2) {
+        timer2.run ();
+    }
+};
+
+/**
+ * Trigger soft timers.
+ */
+template<typename Timer1, typename Timer2, typename Timer3>
+inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2, Timer3 &timer3) {
+    // First step: Check all timers.
+
+    uint8_t r1 = timer1.decrement_and_check ();
+    uint8_t r2 = timer2.decrement_and_check ();
+    uint8_t r3 = timer3.decrement_and_check ();
+
+    // Second step: Run triggered tasks
+
+    if (!r1) {
+        timer1.run ();
+    }
+
+    if (!r2) {
+        timer2.run ();
+    }
+
+    if (!r3) {
+        timer3.run ();
+    }
+};
+
+/**
+ * Trigger soft timers.
+ */
+template<typename Timer1, typename Timer2, typename Timer3, typename Timer4>
+inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2, Timer3 &timer3, Timer4 &timer4) {
+    // First step: Check all timers.
+
+    uint8_t r1 = timer1.decrement_and_check ();
+    uint8_t r2 = timer2.decrement_and_check ();
+    uint8_t r3 = timer3.decrement_and_check ();
+    uint8_t r4 = timer3.decrement_and_check ();
+
+    // Second step: Run triggered tasks
+
+    if (!r1) {
+        timer1.run ();
+    }
+
+    if (!r2) {
+        timer2.run ();
+    }
+
+    if (!r3) {
+        timer3.run ();
+    }
+
+    if (!r4) {
+        timer4.run ();
+    }
+};
+
+#define AKAT_STIMER_8BIT(name, reg)                                           \
+    register uint8_t __soft_timer_##name##_counter__ asm(reg);                \
+                                                                              \
+    FORCE_INLINE void __soft_timer_##name##_f__ ();                           \
+                                                                              \
+    struct __soft_timer_##name##_t__ {                                        \
+        FORCE_INLINE void set (uint8_t time) {                                \
+            __soft_timer_##name##_counter__ = time;                           \
+        }                                                                     \
+                                                                              \
+        FORCE_INLINE uint8_t get (uint8_t time) {                             \
+            return __soft_timer_##name##_counter__;                           \
+        }                                                                     \
+                                                                              \
+        FORCE_INLINE void cancel () {                                         \
+            __soft_timer_##name##_counter__ = 0;                              \
+        }                                                                     \
+                                                                              \
+        FORCE_INLINE uint8_t decrement_and_check () {                         \
+            if (__soft_timer_##name##_counter__) {                            \
+                AKAT_DEC_REG (__soft_timer_##name##_counter__);               \
+                return __soft_timer_##name##_counter__;                       \
+            }                                                                 \
+            return 1;                                                         \
+        }                                                                     \
+                                                                              \
+        FORCE_INLINE void run () {                                            \
+            __soft_timer_##name##_f__ ();                                     \
+        }                                                                     \
+    } name;                                                                   \
+                                                                              \
+    FORCE_INLINE void __soft_timer_##name##_f__ ()
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

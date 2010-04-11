@@ -18,4 +18,3 @@
  */
 void akat_init_timer () {
 }
-
