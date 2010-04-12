@@ -356,7 +356,7 @@ void akat_atmega48_internal_timer0_ctc (uint16_t prescaler,
  * Converts 'us' to prescaler and resolution and pass them as parameters to the given function.
  */
 template<void (*f)(uint16_t, uint8_t)>
-FORCE_INLINE inline void akat_call_with_prescaler_and_resolution (uint32_t us)
+FORCE_INLINE inline void akat_call_with_prescaler_and_resolution (uint32_t us = 0)
 {
     uint16_t prescaler = akat_find_closest_prescaler (us);
     uint32_t resolution = akat_find_closest_resolution (us, prescaler);
@@ -370,8 +370,8 @@ FORCE_INLINE inline void akat_call_with_prescaler_and_resolution (uint32_t us)
  * 'usA' or 'usB' might be 0 in order to disable the given channel.
  */
 template<void (*f)(uint16_t, uint8_t, uint8_t)>
-FORCE_INLINE inline void akat_call_with_prescaler_and_resolutions (uint32_t usA,
-                                                            uint32_t usB)
+FORCE_INLINE inline void akat_call_with_prescaler_and_resolutions (uint32_t usA = 0,
+                                                                   uint32_t usB = 0)
 {
     if (!usA && !usB) {
         return;
