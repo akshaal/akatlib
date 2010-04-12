@@ -283,9 +283,9 @@ __attribute__((error("Given timer interval can't be represented by prescaler and
 extern void akat_find_prescaler_error_pr__ (uint32_t);
 
 __attribute__((error("This function must be eliminated by GCC's optimizer")))
-inline void akat_check_prescaler_and_resolution (uint32_t us,
-                                                 uint16_t prescaler,
-                                                 uint8_t resolution)
+FORCE_INLINE inline void akat_check_prescaler_and_resolution (uint32_t us,
+                                          uint16_t prescaler,
+                                          uint8_t resolution)
 {
     uint32_t calculated_us = freq2usecs (akat_cpu_freq_hz () / prescaler / (resolution + 1));
 
@@ -298,7 +298,7 @@ inline void akat_check_prescaler_and_resolution (uint32_t us,
  * Find prescaller value for the given frequency. Assuming that timer works
  * on the same clock as CPU.
  */
-inline uint16_t akat_find_closest_prescaler (uint32_t us) {
+FORCE_INLINE inline uint16_t akat_find_closest_prescaler (uint32_t us) {
     uint32_t freq_needed = usecs2freq (us);
 
     if (akat_cpu_freq_hz () / freq_needed < 256) {
@@ -329,20 +329,18 @@ inline uint16_t akat_find_closest_prescaler (uint32_t us) {
  * Find closest resolution for a timer that is supposed to be invoked every 'us' useconds
  * with the given 'prescaler'.
  */
-inline uint16_t akat_find_closest_resolution (uint32_t us, uint16_t prescaler) {
+FORCE_INLINE inline uint16_t akat_find_closest_resolution (uint32_t us, uint16_t prescaler) {
     return akat_cpu_freq_hz() / usecs2freq (us) / prescaler - 1;
 }
 
 /**
  * Init timer0 in CTC mode.
  */
-FORCE_INLINE
 void akat_atmega16_internal_timer0_ctc (uint16_t prescaler, uint8_t resolution);
 
 /**
  * Init timer0 in CTC mode.
  */
-FORCE_INLINE
 void akat_attiny85_internal_timer0_ctc (uint16_t prescaler,
                                         uint8_t resolutionA,
                                         uint8_t resolutionB);
@@ -350,7 +348,6 @@ void akat_attiny85_internal_timer0_ctc (uint16_t prescaler,
 /**
  * Init timer0 in CTC mode.
  */
-FORCE_INLINE
 void akat_atmega48_internal_timer0_ctc (uint16_t prescaler,
                                         uint8_t resolutionA,
                                         uint8_t resolutionB);
@@ -358,8 +355,8 @@ void akat_atmega48_internal_timer0_ctc (uint16_t prescaler,
 /**
  * Converts 'us' to prescaler and resolution and pass them as parameters to the given function.
  */
-inline void akat_call_with_prescaler_and_resolution (uint32_t us,
-                                                     void (*f)(uint16_t, uint8_t))
+template<void (*f)(uint16_t, uint8_t)>
+FORCE_INLINE inline void akat_call_with_prescaler_and_resolution (uint32_t us)
 {
     uint16_t prescaler = akat_find_closest_prescaler (us);
     uint32_t resolution = akat_find_closest_resolution (us, prescaler);
@@ -372,9 +369,9 @@ inline void akat_call_with_prescaler_and_resolution (uint32_t us,
  * Converts 'us' to prescaler and resolution and pass them as parameters to the given function.
  * 'usA' or 'usB' might be 0 in order to disable the given channel.
  */
-inline void akat_call_with_prescaler_and_resolutions (uint32_t usA,
-                                                      uint32_t usB,
-                                                      void (*f)(uint16_t, uint8_t, uint8_t))
+template<void (*f)(uint16_t, uint8_t, uint8_t)>
+FORCE_INLINE inline void akat_call_with_prescaler_and_resolutions (uint32_t usA,
+                                                            uint32_t usB)
 {
     if (!usA && !usB) {
         return;
