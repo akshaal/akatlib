@@ -96,6 +96,7 @@ extern uint32_t akat_cpu_freq_hz ();
 // Register loaded with 1. +0 prevent from override
 #define AKAT_ONE (akat_one__ + 0)
 
+// This variable is supposed to host 1 always
 register uint8_t akat_one__ asm("r3");
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -399,22 +400,24 @@ FORCE_INLINE inline void akat_call_with_prescaler_and_resolutions (uint32_t usA 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // GPIO
 
-#define AKAT_DEFINE_PIN_ACCESS_FUNC(name, reg, port_char, pin_idx)       \
-   FORCE_INLINE uint8_t is_##name () {                                   \
-       return AKAT_CONCAT(reg, port_char) & (1 << pin_idx);              \
-   }                                                                     \
-                                                                         \
-   FORCE_INLINE void set_##name (uint8_t state) {                        \
-       if (state) {                                                      \
-           AKAT_CONCAT(reg, port_char) |= 1 << pin_idx;                  \
-       } else {                                                          \
-           AKAT_CONCAT(reg, port_char) &= ~(1 << pin_idx);               \
-       }                                                                 \
+#define AKAT_DEFINE_PIN_ACCESS_FUNC(reg, port_char, pin_idx)         \
+   FORCE_INLINE uint8_t is_##name () {                               \
+       return AKAT_CONCAT(reg, port_char) & (1 << pin_idx);          \
+   }                                                                 \
+                                                                     \
+   FORCE_INLINE void set_##name (uint8_t state) {                    \
+       if (state) {                                                  \
+           AKAT_CONCAT(reg, port_char) |= 1 << pin_idx;              \
+       } else {                                                      \
+           AKAT_CONCAT(reg, port_char) &= ~(1 << pin_idx);           \
+       }                                                             \
    }
 
-#define AKAT_DEFINE_PIN(name, port_char, pin_idx)                        \
-    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_port, PORT, port_char, pin_idx)   \
-    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_ddr, DDR, port_char, pin_idx)     \
-    AKAT_DEFINE_PIN_ACCESS_FUNC(name##_pin, PIN, port_char, pin_idx)
+#define AKAT_DEFINE_PIN(name, port_char, pin_idx)                    \
+    struct name##_t {                                                \
+        AKAT_DEFINE_PIN_ACCESS_FUNC(port, PORT, port_char, pin_idx)  \
+        AKAT_DEFINE_PIN_ACCESS_FUNC(ddr, DDR, port_char, pin_idx)    \
+        AKAT_DEFINE_PIN_ACCESS_FUNC(pin, PIN, port_char, pin_idx)    \
+    } name;
 
 #endif
