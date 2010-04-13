@@ -99,6 +99,53 @@ extern uint32_t akat_cpu_freq_hz ();
 // This variable is supposed to host 1 always
 register uint8_t akat_one__ asm("r3");
 
+// Delay. Delay function is non atomic!
+// Routines are borrowed from avr-lib
+__attribute__((error("akat_delay_us and akat_delay_us must be used with -O compiler flag and constant argument!")))
+extern void akat_delay_us_error_nc__ ();
+
+__attribute__((error("akat_delay_us and akat_delay_us can't perform such a small delay!")))
+extern void akat_delay_us_error_delay__ ();
+
+__attribute__((error("akat_delay_us and akat_delay_us can't perform such a long delay!")))
+extern void akat_delay_us_error_bdelay__ ();
+
+FORCE_INLINE inline void akat_delay_us (uint32_t us) {
+    if (!__builtin_constant_p(us)) {
+        akat_delay_us_error_nc__ ();
+    }
+
+    uint64_t cycles = (uint64_t)us * (uint64_t)akat_cpu_freq_hz () / (uint64_t)1000000L;
+
+    if (cycles / 3 == 0) {
+        akat_delay_us_error_delay__ ();
+    } else if (cycles / 3 < 256) {
+        uint8_t __count = cycles;
+
+	__asm__ volatile (
+		"1: dec %0" "\n\t"
+		"brne 1b"
+		: "=r" (__count)
+		: "0" (__count)
+	);
+    } else if (cycles / 4 > 65535) {
+        akat_delay_us_error_bdelay__ ();
+    } else {
+        uint16_t __count = cycles / 4;
+
+	__asm__ volatile (
+		"1: sbiw %0,1" "\n\t"
+		"brne 1b"
+		: "=w" (__count)
+		: "0" (__count)
+	);
+    }
+}
+
+FORCE_INLINE inline void akat_delay_ms (uint16_t ms) {
+    akat_delay_us (1000L * (uint32_t)ms);
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Debug
 
@@ -400,7 +447,7 @@ FORCE_INLINE inline void akat_call_with_prescaler_and_resolutions (uint32_t usA 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // GPIO
 
-#define AKAT_DEFINE_PIN_ACCESS_FUNC(reg, port_char, pin_idx)         \
+#define AKAT_DEFINE_PIN_ACCESS_FUNC(name, reg, port_char, pin_idx)   \
    FORCE_INLINE uint8_t is_##name () {                               \
        return AKAT_CONCAT(reg, port_char) & (1 << pin_idx);          \
    }                                                                 \
