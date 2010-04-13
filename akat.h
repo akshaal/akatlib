@@ -120,7 +120,7 @@ FORCE_INLINE inline void akat_delay_us (uint32_t us) {
     if (cycles / 3 == 0) {
         akat_delay_us_error_delay__ ();
     } else if (cycles / 3 < 256) {
-        uint8_t __count = cycles;
+        uint8_t __count = cycles / 3;
 
 	__asm__ volatile (
 		"1: dec %0" "\n\t"
