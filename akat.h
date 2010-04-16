@@ -49,6 +49,7 @@
     /* Code to run when dispatcher is idle. */                                         \
     FORCE_INLINE void akat_dispatcher_idle () {                                        \
         dispatcher_idle_code;                                                          \
+        ;__asm__ ("\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n");                              \
     }                                                                                  \
                                                                                        \
     /* Code to run when dispatcher overflowed. */                                      \
