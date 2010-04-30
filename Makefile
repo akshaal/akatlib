@@ -8,7 +8,7 @@ CXXFLAGS=-std=gnu++0x -Wall -Os -fomit-frame-pointer \
          -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
          -fshort-enums -ffreestanding -Wl,--relax \
          -fno-tree-scev-cprop -fno-strict-aliasing -mmcu=${MCU} \
-         -flto -mcall-prologues 
+         -flto -mcall-prologues
 VERSION=1.0
 
 OBJS = dispatcher.o debug.o state.o init.o timer.o hwtimer.o

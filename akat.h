@@ -17,6 +17,7 @@
 //    r4, r5 - dispatcher
 
 #define FORCE_INLINE    __attribute__ ((always_inline))
+#define NO_INLINE       __attribute__ ((noinline))
 
 // Initializing declaration.
 // cpu_freq - timer frequency
@@ -61,7 +62,7 @@
 /**
  * Initialize akat library.
  */
-void akat_init ();
+extern void akat_init ();
 
 // Declare debug flag functions by using one of definitions: AKAT_DUBUG_ON, AKAT_DEBUG_OFF.
 // AKAT_DEBUG_ON takes precedence of AKAT_DEBUG_OFF. So if both are defined, then
@@ -98,7 +99,7 @@ extern uint32_t akat_cpu_freq_hz ();
 #define AKAT_ONE (akat_one__ + 0)
 
 // This variable is supposed to host 1 always
-register uint8_t akat_one__ asm("r3");
+register uint8_t akat_one__ asm ("r3");
 
 // Delay. Delay function is non atomic!
 // Routines are borrowed from avr-lib

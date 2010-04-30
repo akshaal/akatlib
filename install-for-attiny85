@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ make clean
+make MCU=attiny85 "$@" install

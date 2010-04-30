@@ -18,7 +18,7 @@
 /**
  * Initialize akat library.
  */
-void akat_init () {
+NO_INLINE void akat_init () {
     akat_one__  = 1;
 
     akat_init_debug ();
