@@ -11,7 +11,8 @@ CXXFLAGS=-std=gnu++0x -Wall -Os -fomit-frame-pointer \
          -flto -mcall-prologues
 VERSION=1.0
 
-OBJS = dispatcher.o debug.o state.o init.o timer.o hwtimer.o
+OBJS = dispatcher.o debug.o state.o init.o timer.o
+EXPORT_INCLUDES=akat.h akat-onewire.h
 LIBNAME = libakat-${MCU}-${VERSION}
 
 all: clean ${OBJS} benchmark
@@ -26,8 +27,9 @@ benchmark: ${OBJS}
 install: all
 	rm -rf ${PREFIX}/lib/${LIBNAME}/
 	mkdir -p ${PREFIX}/lib/${LIBNAME}/
+	mkdir -p ${PREFIX}/include/akat-${VERSION}/
 	install -m 0644 ${OBJS} ${PREFIX}/lib/${LIBNAME}/
-	install -m 0644 akat.h ${PREFIX}/include/akat-${VERSION}.h
+	install -m 0644 ${EXPORT_INCLUDES} ${PREFIX}/include/akat-${VERSION}/
 
 clean:
 	rm -rf *.o *.i *.s *.a out
