@@ -16,8 +16,11 @@
 //    r3 - holds 1
 //    r4, r5 - dispatcher
 
-#define FORCE_INLINE    __attribute__ ((always_inline))
-#define NO_INLINE       __attribute__ ((noinline))
+#define FORCE_INLINE    __attribute__((always_inline)) inline
+#define NO_INLINE       __attribute__((noinline))
+
+// This variable is supposed to host 1 always
+register uint8_t akat_one__ asm ("r3");
 
 // Initializing declaration.
 // cpu_freq - timer frequency
@@ -56,7 +59,7 @@
     /* Code to run when dispatcher overflowed. */                                      \
     FORCE_INLINE void akat_dispatcher_overflow () {                                    \
         dispatcher_overflow_code;                                                      \
-    }                                                                                  
+    }
 
 
 /**
@@ -98,9 +101,6 @@ extern uint32_t akat_cpu_freq_hz ();
 // Register loaded with 1. +0 prevent from override
 #define AKAT_ONE (akat_one__ + 0)
 
-// This variable is supposed to host 1 always
-register uint8_t akat_one__ asm ("r3");
-
 // Delay. Delay function is non atomic!
 // Routines are borrowed from avr-lib
 __attribute__((error("akat_delay_us and akat_delay_us must be used with -O compiler flag and constant argument!")))
@@ -112,7 +112,7 @@ extern void akat_delay_us_error_delay__ ();
 __attribute__((error("akat_delay_us and akat_delay_us can't perform such a long delay!")))
 extern void akat_delay_us_error_bdelay__ ();
 
-FORCE_INLINE inline void akat_delay_us (uint32_t us) {
+FORCE_INLINE void akat_delay_us (uint32_t us) {
     if (!__builtin_constant_p(us)) {
         akat_delay_us_error_nc__ ();
     }
@@ -124,27 +124,27 @@ FORCE_INLINE inline void akat_delay_us (uint32_t us) {
     } else if (cycles / 3 < 256) {
         uint8_t __count = cycles / 3;
 
-	__asm__ volatile (
-		"1: dec %0" "\n\t"
-		"brne 1b"
-		: "=r" (__count)
-		: "0" (__count)
-	);
+    __asm__ volatile (
+        "1: dec %0" "\n\t"
+        "brne 1b"
+        : "=r" (__count)
+        : "0" (__count)
+    );
     } else if (cycles / 4 > 65535) {
         akat_delay_us_error_bdelay__ ();
     } else {
         uint16_t __count = cycles / 4;
 
-	__asm__ volatile (
-		"1: sbiw %0,1" "\n\t"
-		"brne 1b"
-		: "=w" (__count)
-		: "0" (__count)
-	);
+    __asm__ volatile (
+        "1: sbiw %0,1" "\n\t"
+        "brne 1b"
+        : "=w" (__count)
+        : "0" (__count)
+    );
     }
 }
 
-FORCE_INLINE inline void akat_delay_ms (uint16_t ms) {
+FORCE_INLINE void akat_delay_ms (uint16_t ms) {
     akat_delay_us (1000L * (uint32_t)ms);
 }
 

@@ -13,6 +13,12 @@
 
 #include "akat.h"
 
+// We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
+// Code is much smaller this way (version with pointer were evaluated).
+register uint8_t g_free_slot asm("r4");
+register uint8_t g_filled_slot asm("r5");
+register uint8_t g_slots asm("r6");
+
 // This is defined by user to provide mask for tasks count
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
 
@@ -25,12 +31,6 @@ extern void akat_dispatcher_overflow ();
 // This is supposed to be defined in the main file, not in library.
 // Array of tasks.
 extern volatile akat_task_t g_akat_tasks[];
-
-// We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
-// Code is much smaller this way (version with pointer were evaluated).
-register uint8_t g_free_slot asm("r4");;
-register uint8_t g_filled_slot asm("r5");
-register uint8_t g_slots asm("r6");
 
 /**
  * Initialize disptacher.
@@ -102,7 +102,7 @@ uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
     uint8_t new_filled_slot = (g_filled_slot - 1) & g_slots;
 
     if (new_filled_slot == g_free_slot) {
-        akat_dispatcher_overflow ();     
+        akat_dispatcher_overflow ();
         return 1;
     } else {
         g_filled_slot = new_filled_slot;
