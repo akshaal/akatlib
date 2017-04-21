@@ -18,6 +18,7 @@ timings = list ()
 begin = None
 
 def on_signal (value, arg):
+    print("on_signal", value)
     if value == 0:
         global begin
         begin = avr.cycle
@@ -25,8 +26,10 @@ def on_signal (value, arg):
         timings.append (avr.cycle - begin)
 
 def on_exit (value, arg):
+    print("on exit:", value)
     global stop
-    stop = True
+    if value != 0:
+        stop = True
 
 avr.get_ioport_irq ('B', 0).register_notify (on_signal)
 avr.get_ioport_irq ('B', 1).register_notify (on_exit)
@@ -34,4 +37,4 @@ avr.get_ioport_irq ('B', 1).register_notify (on_exit)
 while not stop:
     avr.run_cycles ()
 
-print >> f, mode + "   " + name + ": size = " + str(avr._firmware.flashsize) + ", timings = " + str(timings)
+print >> f, mode + "   " + name + ": size = " + str(avr._firmware.flashsize) + ", timings = " + str(timings).replace("L", "")

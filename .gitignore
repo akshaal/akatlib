@@ -6,3 +6,5 @@
 *.i
 *.ii
 *.avr
+benchmark/*.out
+benchmark/*.res

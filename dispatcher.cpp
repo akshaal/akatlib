@@ -15,9 +15,9 @@
 
 // We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
 // Code is much smaller this way (version with pointer were evaluated).
-register uint8_t g_free_slot asm("r4");
-register uint8_t g_filled_slot asm("r5");
-register uint8_t g_slots asm("r6");
+uint8_t g_free_slot;
+uint8_t g_filled_slot;
+uint8_t g_slots;
 
 // This is defined by user to provide mask for tasks count
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;

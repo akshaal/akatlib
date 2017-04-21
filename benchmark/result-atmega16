@@ -25,3 +25,13 @@ Tue Apr 13 11:38:34 EEST 2010
 Tue Apr 13 11:40:41 EEST 2010
 
 Fri Apr 16 10:43:30 EEST 2010
+
+fr. 21. april 21:51:00 +0200 2017
+Os   tasks: size = 400, timings = [2, 39, 39, 38, 38, 32, 37, 37, 37, 15]
+O3   tasks: size = 410, timings = [2, 36, 36, 37, 37, 32, 35, 35, 35, 13]
+Os   timer1: size = 204, timings = [2, 4, 18, 14, 17]
+O3   timer1: size = 238, timings = [2, 4, 12, 10, 7]
+Os   timer2: size = 246, timings = [2, 4, 3, 26, 26, 29]
+O3   timer2: size = 262, timings = [2, 4, 3, 25, 24, 27]
+Os   timer4: size = 318, timings = [2, 4, 3, 3, 3, 49, 7, 39, 57]
+O3   timer4: size = 316, timings = [2, 4, 3, 3, 3, 39, 7, 36, 58]

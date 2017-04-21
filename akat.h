@@ -12,15 +12,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// Registered used by akat:
-//    r3 - holds 1
-//    r4, r5 - dispatcher
-
-#define FORCE_INLINE    __attribute__((always_inline)) inline
-#define NO_INLINE       __attribute__((noinline))
-
-// This variable is supposed to host 1 always
-register uint8_t akat_one__ asm ("r3");
+#define FORCE_INLINE    __attribute__ ((always_inline)) inline
+#define NO_INLINE       __attribute__ ((noinline))
 
 // Initializing declaration.
 // cpu_freq - timer frequency
@@ -41,7 +34,7 @@ register uint8_t akat_one__ asm ("r3");
     __attribute__ ((error("Tasks count must be one of the following: 1,2,4,8,16,32"))) \
     extern void akat_dispatcher_error_ ();                                             \
                                                                                        \
-    FORCE_INLINE uint8_t akat_dispatcher_tasks_mask () {                               \
+    uint8_t akat_dispatcher_tasks_mask () {                                            \
         if (!(tasks == 1 || tasks == 2 || tasks == 4 || tasks == 8                     \
                            || tasks == 16 || tasks == 32))                             \
         {                                                                              \
@@ -51,13 +44,13 @@ register uint8_t akat_one__ asm ("r3");
     }                                                                                  \
                                                                                        \
     /* Code to run when dispatcher is idle. */                                         \
-    FORCE_INLINE void akat_dispatcher_idle () {                                        \
+    void akat_dispatcher_idle () {                                                     \
         dispatcher_idle_code;                                                          \
         ;__asm__ ("\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n");                              \
     }                                                                                  \
                                                                                        \
     /* Code to run when dispatcher overflowed. */                                      \
-    FORCE_INLINE void akat_dispatcher_overflow () {                                    \
+    void akat_dispatcher_overflow () {                                                 \
         dispatcher_overflow_code;                                                      \
     }
 
@@ -97,9 +90,6 @@ extern uint32_t akat_cpu_freq_hz ();
 // Fast increment/decrement
 #define AKAT_INC_REG(reg) asm ("inc %0" : "+r" (reg));
 #define AKAT_DEC_REG(reg) asm ("dec %0" : "+r" (reg));
-
-// Register loaded with 1. +0 prevent from override
-#define AKAT_ONE (akat_one__ + 0)
 
 // Delay. Delay function is non atomic!
 // Routines are borrowed from avr-lib
@@ -290,7 +280,7 @@ inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2, Timer3 &timer3
 };
 
 #define AKAT_STIMER_8BIT(name, reg)                                           \
-    register uint8_t __soft_timer_##name##_counter__ asm(reg);                \
+    uint8_t __soft_timer_##name##_counter__;                                  \
                                                                               \
     FORCE_INLINE void __soft_timer_##name##_f__ ();                           \
                                                                               \

@@ -7,7 +7,7 @@
 #include "akat.h"
 #include "benchmark.h"
 
-void idle (void) {
+static void idle (void) {
     BENCH
 
     BENCH_EXIT

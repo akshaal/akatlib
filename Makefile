@@ -12,7 +12,7 @@ CXXFLAGS=-std=gnu++0x -Wall -Os -fomit-frame-pointer \
 VERSION=1.0
 
 OBJS = dispatcher.o debug.o state.o init.o timer.o
-EXPORT_INCLUDES=akat.h akat-onewire.h
+EXPORT_INCLUDES=akat.h
 LIBNAME = libakat-${MCU}-${VERSION}
 
 all: clean ${OBJS} benchmark
