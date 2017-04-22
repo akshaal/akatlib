@@ -2,6 +2,7 @@ HOST = avr
 
 CXX = ${HOST}-g++
 OBJDUMP = ${HOST}-objdump
+OBJCOPY = ${HOST}-objcopy
 
 CXXFLAGS=-std=gnu++14 -Wall -fomit-frame-pointer \
          -funsigned-char -funsigned-bitfields -fpack-struct \
