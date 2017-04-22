@@ -5,7 +5,7 @@ OBJDUMP = ${HOST}-objdump
 
 CXXFLAGS=-std=gnu++14 -Wall -fomit-frame-pointer \
          -funsigned-char -funsigned-bitfields -fpack-struct \
-         -fshort-enums -ffreestanding -Wl,--relax -Wl,--gc-sections -fstack-arrays \
+         -fshort-enums -ffreestanding -Wl,--relax -Wl,--gc-sections \
          -fno-strict-aliasing -mmcu=${MCU} -ftree-loop-ivcanon -fivopts -frename-registers \
          -fwhole-program -maccumulate-args -mcall-prologues -mrelax -nodevicelib -fipa-pta \
         --param early-inlining-insns=1000000 \
