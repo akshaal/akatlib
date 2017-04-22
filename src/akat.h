@@ -1,8 +1,6 @@
 ///////////////////////////////////////////////////////////////////
 // Useful functions for rapid development for AVR microcontrollers.
-// 2010 (C) Akshaal
-// http://www.akshaal.info    or    http://rus.akshaal.info
-// GNU GPL
+// 2010 (C) Akshaal, Apache License
 ///////////////////////////////////////////////////////////////////
 
 #ifndef AKAT_H_
@@ -11,6 +9,9 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+// Registered used by akat:
+//    r4, r5, r6 - dispatcher
 
 #define FORCE_INLINE    __attribute__ ((always_inline)) inline
 #define NO_INLINE       __attribute__ ((noinline))
@@ -23,7 +24,7 @@
                      tasks,                                                            \
                      dispatcher_idle_code,                                             \
                      dispatcher_overflow_code)                                         \
-    volatile akat_task_t g_akat_tasks [tasks];                                         \
+    volatile akat_task_t g_akat_tasks[tasks];                                          \
                                                                                        \
     /* CPU freq */                                                                     \
     FORCE_INLINE uint32_t akat_cpu_freq_hz () {                                        \
@@ -280,7 +281,7 @@ inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2, Timer3 &timer3
 };
 
 #define AKAT_STIMER_8BIT(name, reg)                                           \
-    uint8_t __soft_timer_##name##_counter__;                                  \
+    register uint8_t __soft_timer_##name##_counter__ asm(reg);                \
                                                                               \
     FORCE_INLINE void __soft_timer_##name##_f__ ();                           \
                                                                               \

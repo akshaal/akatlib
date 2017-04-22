@@ -18,7 +18,6 @@ timings = list ()
 begin = None
 
 def on_signal (value, arg):
-    print("on_signal", value)
     if value == 0:
         global begin
         begin = avr.cycle
@@ -26,7 +25,6 @@ def on_signal (value, arg):
         timings.append (avr.cycle - begin)
 
 def on_exit (value, arg):
-    print("on exit:", value)
     global stop
     if value != 0:
         stop = True

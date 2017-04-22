@@ -16,9 +16,6 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-#include "debug.h"
-#include "state.h"
-
 static FILE g_debug_out;
 
 /**

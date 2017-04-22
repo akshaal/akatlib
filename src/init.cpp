@@ -5,11 +5,14 @@
 // GNU GPL
 ///////////////////////////////////////////////////////////////////
 
-// State for akat
+// Initialization
 
-#include "state.h"
+#include <stdint.h>
 
 /**
- * State of akat library.
+ * Initialize akat library.
  */
-akat_state_t akat_state;
+NO_INLINE void akat_init () {
+    akat_init_debug ();
+    akat_init_dispatcher ();
+}

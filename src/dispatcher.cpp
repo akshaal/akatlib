@@ -11,14 +11,6 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-#include "akat.h"
-
-// We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
-// Code is much smaller this way (version with pointer were evaluated).
-uint8_t g_free_slot;
-uint8_t g_filled_slot;
-uint8_t g_slots;
-
 // This is defined by user to provide mask for tasks count
 extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
 
@@ -31,6 +23,13 @@ extern void akat_dispatcher_overflow ();
 // This is supposed to be defined in the main file, not in library.
 // Array of tasks.
 extern volatile akat_task_t g_akat_tasks[];
+
+// We use indexes, not pointers, because indexes are smaller (1 bytes) than pointers (2 bytes).
+// Code is much smaller this way (version with pointer were evaluated).
+register uint8_t g_free_slot asm("r4");;
+register uint8_t g_filled_slot asm("r5");
+register uint8_t g_slots asm("r6");
+
 
 /**
  * Initialize disptacher.
