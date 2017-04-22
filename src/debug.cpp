@@ -19,21 +19,16 @@
 static FILE g_debug_out;
 
 /**
- * This external function should gives us state of debugging.
- */
-extern uint8_t is_akat_debug_on () __ATTR_PURE__ __ATTR_CONST__;
-
-/**
  * Send a char to the stream. Used to redirect debug output to the microcontroller's UART.
  */
-static int akat_debug_uart_putchar (char c, FILE *stream) {
+static int akat_debug_uart_putchar(char c, FILE *stream) {
    ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
 #ifdef UCSR0A
         if (c == '\n') {
             akat_debug_uart_putchar('\r', stream);
         }
 
-        loop_until_bit_is_set (UCSR0A, UDRE0);
+        loop_until_bit_is_set(UCSR0A, UDRE0);
 
         UDR0 = c;
 #else
@@ -42,7 +37,7 @@ static int akat_debug_uart_putchar (char c, FILE *stream) {
             akat_debug_uart_putchar('\r', stream);
         }
 
-        loop_until_bit_is_set (UCSRA, UDRE);
+        loop_until_bit_is_set(UCSRA, UDRE);
 
         UDR = c;
 #endif
@@ -55,7 +50,7 @@ static int akat_debug_uart_putchar (char c, FILE *stream) {
 /**
  * Init debug logger support.
  */
-void akat_init_debug () {
+static void akat_init_debug() {
     if (is_akat_debug_on ()) {
         fdev_setup_stream (&g_debug_out, akat_debug_uart_putchar, NULL, _FDEV_SETUP_WRITE);
     }
@@ -64,30 +59,30 @@ void akat_init_debug () {
 /**
  * Like vprintf but output is redirected to the debug stream.
  */
-void akat_vdebugf (char *fmt, va_list ap) {
-    if (is_akat_debug_on ()) {
-        vfprintf (&g_debug_out, fmt, ap);
+static void akat_vdebugf(char *fmt, va_list ap) {
+    if (is_akat_debug_on()) {
+        vfprintf(&g_debug_out, fmt, ap);
     }
 }
 
 /**
  * Like printf but output is redirected to the debug stream.
  */
-void akat_debugf (char *fmt, ...) {
-    if (is_akat_debug_on ()) {
+static void akat_debugf(char *fmt, ...) {
+    if (is_akat_debug_on()) {
         va_list ap;
 
-        va_start (ap, fmt);
-        akat_vdebugf (fmt, ap);
-        va_end (ap);
+        va_start(ap, fmt);
+        akat_vdebugf(fmt, ap);
+        va_end(ap);
     }
 }
 
 /**
  * Send string to the debug output.
  */
-void akat_debug (char *str) {
-    if (is_akat_debug_on ()) {
-        fputs (str, &g_debug_out);
+static void akat_debug(char *str) {
+    if (is_akat_debug_on()) {
+        fputs(str, &g_debug_out);
     }
 }

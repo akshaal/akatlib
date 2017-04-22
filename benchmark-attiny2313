@@ -1,4 +1,3 @@
 #!/bin/sh
 
-./reset-results
 ./benchmark-one attiny2313 "$@"

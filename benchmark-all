@@ -2,8 +2,6 @@
 
 list="atmega16 atmega32 attiny2313 attiny85 atmega48"
 
-./reset-results
-
 for mcu in $list; do
     ./benchmark-one "$mcu" "$@"
 done

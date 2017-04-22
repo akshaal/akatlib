@@ -13,8 +13,9 @@
 // Registered used by akat:
 //    r4, r5, r6 - dispatcher
 
-#define FORCE_INLINE    __attribute__ ((always_inline)) inline
-#define NO_INLINE       __attribute__ ((noinline))
+#define FORCE_INLINE    __attribute__((always_inline)) inline
+#define NO_INLINE       __attribute__((noinline))
+#define __ATTR_UNUSED__       __attribute__((unused))
 
 // Initializing declaration.
 // cpu_freq - timer frequency
@@ -27,7 +28,7 @@
     volatile akat_task_t g_akat_tasks[tasks];                                          \
                                                                                        \
     /* CPU freq */                                                                     \
-    FORCE_INLINE uint32_t akat_cpu_freq_hz () {                                        \
+    static FORCE_INLINE uint32_t akat_cpu_freq_hz()  {                                 \
         return cpu_freq;                                                               \
     }                                                                                  \
                                                                                        \
@@ -35,7 +36,7 @@
     __attribute__ ((error("Tasks count must be one of the following: 1,2,4,8,16,32"))) \
     extern void akat_dispatcher_error_ ();                                             \
                                                                                        \
-    FORCE_INLINE uint8_t akat_dispatcher_tasks_mask () {                               \
+    static FORCE_INLINE uint8_t akat_dispatcher_tasks_mask () {                        \
         if (!(tasks == 1 || tasks == 2 || tasks == 4 || tasks == 8                     \
                            || tasks == 16 || tasks == 32))                             \
         {                                                                              \
@@ -45,13 +46,13 @@
     }                                                                                  \
                                                                                        \
     /* Code to run when dispatcher is idle. */                                         \
-    void akat_dispatcher_idle () {                                                     \
+    static FORCE_INLINE void akat_dispatcher_idle () {                                 \
         dispatcher_idle_code;                                                          \
         ;__asm__ ("\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n");                              \
     }                                                                                  \
                                                                                        \
     /* Code to run when dispatcher overflowed. */                                      \
-    void akat_dispatcher_overflow () {                                                 \
+    static FORCE_INLINE void akat_dispatcher_overflow () {                             \
         dispatcher_overflow_code;                                                      \
     }
 
@@ -59,7 +60,7 @@
 /**
  * Initialize akat library.
  */
-extern void akat_init ();
+static void akat_init ();
 
 // Declare debug flag functions by using one of definitions: AKAT_DUBUG_ON, AKAT_DEBUG_OFF.
 // AKAT_DEBUG_ON takes precedence of AKAT_DEBUG_OFF. So if both are defined, then
@@ -67,17 +68,15 @@ extern void akat_init ();
 // (program can't be linked).
 
 #ifdef AKAT_DEBUG_ON
-uint8_t is_akat_debug_on () {return 1;}
+static FORCE_INLINE uint8_t is_akat_debug_on () {return 1;} __ATTR_CONST__ __ATTR_PURE__
 #else
-
 #ifdef AKAT_DEBUG_OFF
-uint8_t is_akat_debug_on () {return 0;}
+static FORCE_INLINE uint8_t is_akat_debug_on () {return 0;} __ATTR_CONST__ __ATTR_PURE__
 #endif
-
 #endif
 
 // Returns cpu frequency HZ.
-extern uint32_t akat_cpu_freq_hz ();
+static uint32_t akat_cpu_freq_hz () __ATTR_CONST__ __ATTR_PURE__;
 
 // Convert usecs to frequency
 #define usecs2freq(usecs) (((uint32_t)1000000) / ((uint32_t)(usecs)))
@@ -103,7 +102,7 @@ extern void akat_delay_us_error_delay__ ();
 __attribute__((error("akat_delay_us and akat_delay_us can't perform such a long delay!")))
 extern void akat_delay_us_error_bdelay__ ();
 
-FORCE_INLINE void akat_delay_us (uint32_t us) {
+static FORCE_INLINE void akat_delay_us (uint32_t us) {
     if (!__builtin_constant_p(us)) {
         akat_delay_us_error_nc__ ();
     }
@@ -145,17 +144,17 @@ FORCE_INLINE void akat_delay_ms (uint16_t ms) {
 /**
  * Like vprintf but output is redirected to the debug stream.
  */
-void akat_vdebugf (char *fmt, va_list ap);
+static void akat_vdebugf(char *fmt, va_list ap) __ATTR_UNUSED__;
 
 /**
  * Like printf but output is redirected to the debug stream.
  */
-void akat_debugf (char *fmt, ...);
+static void akat_debugf(char *fmt, ...) __ATTR_UNUSED__;
 
 /**
  * Sends a string to output. This is a ligher and faster than debugf.
  */
-void akat_debug (char *str);
+static void akat_debug(char *str) __ATTR_UNUSED__;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Dispatcher
@@ -165,29 +164,29 @@ typedef void (*akat_task_t)(void);
 /**
  * Dispatch tasks.
  */
-void akat_dispatcher_loop () __ATTR_NORETURN__;
+static void akat_dispatcher_loop() __ATTR_NORETURN__;
 
 /**
  * Dispatch task. Returns 1 if task was discarded (because tasks queue is full).
  * This function is supposed to be used only when interrupts are already disabled.
  */
-uint8_t akat_put_task_nonatomic (akat_task_t task);
+static uint8_t akat_put_task_nonatomic(akat_task_t task) __ATTR_UNUSED__;
 
 /**
  * Dispatch task. Returns 1 if task was discarded (because tasks queue is full).
  */
-uint8_t akat_put_task (akat_task_t task);
+static uint8_t akat_put_task (akat_task_t task) __ATTR_UNUSED__;
 
 /**
  * Dispatch hi-priority task. Returns 1 if task was discarded (because tasks queue is full).
  * This function is supposed to be used only when interrupts are already disabled.
  */
-uint8_t akat_put_hi_task_nonatomic (akat_task_t task);
+static uint8_t akat_put_hi_task_nonatomic (akat_task_t task) __ATTR_UNUSED__;
 
 /**
  * Dispatch hi-priority task. Returns 1 if task was discarded (because tasks queue is full).
  */
-uint8_t akat_put_hi_task (akat_task_t task);
+static uint8_t akat_put_hi_task (akat_task_t task) __ATTR_UNUSED__;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Soft timers
@@ -196,7 +195,7 @@ uint8_t akat_put_hi_task (akat_task_t task);
  * Trigger soft timers.
  */
 template<typename Timer>
-inline void akat_trigger_stimers (Timer &timer) {
+inline void akat_trigger_stimers(Timer &timer) {
     if (!timer.decrement_and_check ()) {
         timer.run ();
     }
@@ -206,7 +205,7 @@ inline void akat_trigger_stimers (Timer &timer) {
  * Trigger soft timers.
  */
 template<typename Timer1, typename Timer2>
-inline void akat_trigger_stimers (Timer1 &timer1, Timer2 &timer2) {
+inline void akat_trigger_stimers(Timer1 &timer1, Timer2 &timer2) {
     // First step: Check all timers.
 
     uint8_t r1 = timer1.decrement_and_check ();

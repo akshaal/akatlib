@@ -12,7 +12,7 @@
 /**
  * Initialize akat library.
  */
-NO_INLINE void akat_init () {
+FORCE_INLINE static void akat_init () {
     akat_init_debug ();
     akat_init_dispatcher ();
 }

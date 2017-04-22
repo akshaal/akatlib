@@ -12,13 +12,13 @@
 #include <util/atomic.h>
 
 // This is defined by user to provide mask for tasks count
-extern uint8_t akat_dispatcher_tasks_mask () __ATTR_PURE__ __ATTR_CONST__;
+static uint8_t akat_dispatcher_tasks_mask() __ATTR_PURE__ __ATTR_CONST__;
 
 // Defined by user to run code when dispatcher is idle.
-extern void akat_dispatcher_idle ();
+static void akat_dispatcher_idle();
 
 // Defined by user to handle a case when too many task are added to the dispatcher.
-extern void akat_dispatcher_overflow ();
+static void akat_dispatcher_overflow();
 
 // This is supposed to be defined in the main file, not in library.
 // Array of tasks.
@@ -30,35 +30,34 @@ register uint8_t g_free_slot asm("r4");;
 register uint8_t g_filled_slot asm("r5");
 register uint8_t g_slots asm("r6");
 
-
 /**
  * Initialize disptacher.
  */
-void akat_init_dispatcher () {
-    g_slots = akat_dispatcher_tasks_mask ();
+static void akat_init_dispatcher() {
+    g_slots = akat_dispatcher_tasks_mask();
 }
 
 /**
  * Dispatch tasks.
  */
 __ATTR_NORETURN__
-void akat_dispatcher_loop () {
+static void akat_dispatcher_loop() {
     // Endless loop
     while (1) {
         // Select task to run
-        cli ();
+        cli();
 
         if (g_free_slot == g_filled_slot) {
-            sei ();
-            akat_dispatcher_idle ();
+            sei();
+            akat_dispatcher_idle();
         } else {
             akat_task_t task_to_run = g_akat_tasks [g_filled_slot];
 
             AKAT_INC_REG (g_filled_slot);
             g_filled_slot &= g_slots;
 
-            sei ();
-            task_to_run ();
+            sei();
+            task_to_run();
         }
     }
 }
@@ -67,11 +66,11 @@ void akat_dispatcher_loop () {
  * Dispatch task. If tasks queue is full, then task is discarded!
  * Non atomic. Must be used with interrupts already disabled!
  */
-uint8_t akat_put_task_nonatomic (akat_task_t task) {
+static uint8_t akat_put_task_nonatomic(akat_task_t task) {
     uint8_t next_free_slot = (g_free_slot + 1) & g_slots;
 
     if (next_free_slot == g_filled_slot) {
-        akat_dispatcher_overflow ();
+        akat_dispatcher_overflow();
         return 1;
     } else {
         g_akat_tasks [g_free_slot] = task;
@@ -83,11 +82,11 @@ uint8_t akat_put_task_nonatomic (akat_task_t task) {
 /**
  * Dispatch task. If tasks queue is full, then task is discarded!
  */
-uint8_t akat_put_task (akat_task_t task) {
+static uint8_t akat_put_task(akat_task_t task) {
     uint8_t rc;
 
-    ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_put_task_nonatomic (task);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        rc = akat_put_task_nonatomic(task);
     }
 
     return rc;
@@ -97,11 +96,11 @@ uint8_t akat_put_task (akat_task_t task) {
  * Dispatch task. If tasks queue is full, then task is discarded!
  * Non atomic. Must be used with interrupts already disabled!
  */
-uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
+static uint8_t akat_put_hi_task_nonatomic(akat_task_t task) {
     uint8_t new_filled_slot = (g_filled_slot - 1) & g_slots;
 
     if (new_filled_slot == g_free_slot) {
-        akat_dispatcher_overflow ();
+        akat_dispatcher_overflow();
         return 1;
     } else {
         g_filled_slot = new_filled_slot;
@@ -113,11 +112,11 @@ uint8_t akat_put_hi_task_nonatomic (akat_task_t task) {
 /**
  * Dispatch task. If tasks queue is full, then task is discarded!
  */
-uint8_t akat_put_hi_task (akat_task_t task) {
+static uint8_t akat_put_hi_task(akat_task_t task) {
     uint8_t rc;
 
-    ATOMIC_BLOCK (ATOMIC_RESTORESTATE) {
-        rc = akat_put_hi_task_nonatomic (task);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        rc = akat_put_hi_task_nonatomic(task);
     }
 
     return rc;

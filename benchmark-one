@@ -4,4 +4,4 @@ mcu="$1"
 shift
 
 echo "----------------- Benchmarking for $mcu ----------------"
-make clean && make MCU="$mcu" "$@" benchmark && git diff -U30 "benchmark/result-$mcu"
+make clean && make MCU="$mcu" "$@" benchmark && git --no-pager diff -U30 "benchmark/result-$mcu"

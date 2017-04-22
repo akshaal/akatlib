@@ -1,4 +1,3 @@
 #!/bin/sh
 
-./reset-results
 ./benchmark-one atmega16 "$@"
