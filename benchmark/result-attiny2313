@@ -382,13 +382,3 @@ Os   timer2: size = 196, timings = [2, 4, 3, 26, 26, 29]
 O3   timer2: size = 212, timings = [2, 4, 3, 25, 24, 27]
 Os   timer4: size = 268, timings = [2, 4, 3, 3, 3, 49, 7, 39, 57]
 O3   timer4: size = 266, timings = [2, 4, 3, 3, 3, 39, 7, 36, 58]
-
-lø. 22. april 17:14:17 +0200 2017
-Os   tasks: size = 452, timings = [2, 40, 40, 42, 42, 26, 29, 29, 29, 16]
-O3   tasks: size = 536, timings = [2, 29, 29, 31, 31, 28, 29, 29, 29, 12]
-Os   timer1: size = 418, timings = [2, 3, 14, 10, 15]
-O3   timer1: size = 508, timings = [2, 3, 6, 6, 5]
-Os   timer2: size = 456, timings = [2, 3, 3, 20, 21, 25]
-O3   timer2: size = 538, timings = [2, 3, 3, 18, 18, 23]
-Os   timer4: size = 510, timings = [2, 3, 3, 3, 3, 34, 7, 29, 49]
-O3   timer4: size = 586, timings = [2, 3, 3, 3, 3, 26, 7, 28, 52]

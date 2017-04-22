@@ -35,7 +35,7 @@
     __attribute__ ((error("Tasks count must be one of the following: 1,2,4,8,16,32"))) \
     extern void akat_dispatcher_error_ ();                                             \
                                                                                        \
-    uint8_t akat_dispatcher_tasks_mask () {                                            \
+    FORCE_INLINE uint8_t akat_dispatcher_tasks_mask () {                               \
         if (!(tasks == 1 || tasks == 2 || tasks == 4 || tasks == 8                     \
                            || tasks == 16 || tasks == 32))                             \
         {                                                                              \

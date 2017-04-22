@@ -1,5 +1,8 @@
 HOST = avr
+
 CXX = ${HOST}-g++
+OBJDUMP = ${HOST}-objdump
+
 CXXFLAGS=-std=gnu++14 -Wall -Os -fomit-frame-pointer \
          -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums \
          -fshort-enums -ffreestanding -Wl,--relax \
